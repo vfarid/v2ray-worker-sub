@@ -24,7 +24,8 @@ const subLinks = [
   "https://raw.githubusercontent.com/freefq/free/master/v2",
   "https://raw.githubusercontent.com/Pawdroid/Free-servers/main/sub",
   "https://raw.githubusercontent.com/aiboboxx/v2rayfree/main/v2",
-  "https://raw.githubusercontent.com/AzadNetCH/Clash/main/V2Ray.txt"
+  "https://raw.githubusercontent.com/AzadNetCH/Clash/main/V2Ray.txt",
+  "https://raw.githubusercontent.com/vpei/Free-Node-Merge/main/o/node.txt"
 ]
 
 //  این بخش حاوی لینک لیست های تامین کننده‌ی کانفیک می باشد. نیازی نیست این قسمت تغییر داده شود
@@ -49,9 +50,9 @@ const myConfigs = [
 const cleanIPPerOperator = {
   AST: [],
   HWB: [],
-  IRC: ['irc.my-domain.com'],
+  IRC: [], // ['irc.my-domain.com'],
   MBT: [],
-  MCI: ['162.159.135.87', '162.159.135.88'],
+  MCI: [], //['162.159.135.87', '162.159.135.88'],
   MKB: [],
   PRS: [],
   RTL: [],
@@ -61,9 +62,32 @@ const cleanIPPerOperator = {
 
 //  به این متغیرها و کدی که در ادامه آمده دست نزنید، مگر اینکه برنامه نویسی جاوا اسکریپت را بلد بوده و دانسته آن را تغییر دهید
 
-const addressList = ["discord.com", "cloudflare.com", "nginx.com", "cdnjs.com"]
-const fpList = ["chrome", "chrome", "chrome", "firefox", "safari", "edge", "ios", "android", "random", "random"]
-const alpnList = ["http/1.1", "h2,http/1.1", "h2,http/1.1"]
+const addressList = [
+  "discord.com",
+  "cloudflare.com",
+  "nginx.com",
+  "cdnjs.com"
+]
+
+const fpList = [
+  "chrome",
+  "chrome",
+  "chrome",
+  "firefox",
+  "safari",
+  "edge",
+  "ios",
+  "android",
+  "random",
+  "random"
+]
+
+const alpnList = [
+  "http/1.1",
+  "h2,http/1.1",
+  "h2,http/1.1"
+]
+
 var cleanIP = ''
 
 export default {
