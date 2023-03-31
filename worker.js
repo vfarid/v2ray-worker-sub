@@ -130,7 +130,7 @@ export default {
         ipList = {...cleanIPPerOperator}
         Object.keys(ipList).forEach((k) => !ipList[k].length && delete ipList[k]);
       }
-      if (!Object.keys(ipList)) {
+      if (!Object.keys(ipList).length) {
         ipList = {COM: ['']}
       }
 
@@ -155,7 +155,7 @@ export default {
         finalConfigList = finalConfigList.concat(getMultipleRandomElements(ssConfigList, maxPerType))
       }
 
-      return new Response(b2a(finalConfigList.join("\n")));
+      return new Response(btoa(finalConfigList.join("\n")));
     } else {
       var url = new URL(request.url)
       var newUrl = new URL("https://" + url.pathname.replace(/^\/|\/$/g, ""))
