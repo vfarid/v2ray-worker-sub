@@ -155,7 +155,7 @@ export default {
         finalConfigList = finalConfigList.concat(getMultipleRandomElements(ssConfigList, maxPerType))
       }
 
-      return new Response((finalConfigList.join("\n")));
+      return new Response(b2a(finalConfigList.join("\n")));
     } else {
       var url = new URL(request.url)
       var newUrl = new URL("https://" + url.pathname.replace(/^\/|\/$/g, ""))
