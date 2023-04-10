@@ -9,7 +9,7 @@
 
 
 //  تعداد کانفیگ از هر نوع را در این متغیر بنویسید
-const maxPerType = 200
+const maxPerType = 400
 
 //  در صورتی که میخواهید کانفیگ‌های اصلی (قبل از ترکیب با ورکر) هم در خروجی آورده شود این متغیر را با عدد 1 مقداردهی کنید
 //  در صورتی که ورکر شما فیلتر نیست و یا از سابدامین شخصی برای ورکر استفاده می‌کنید بهتر است این متغیر مقدار 0 داشته باشد
@@ -38,35 +38,24 @@ const cnfLinks = [
 //  اگر نمیدانید این بخش چه کاربردی برای شما دارد، آن را بدون تغییر رها کنید
 //  توجه داشته باشید که هر کانفیگ باید در یک خط و داخل گیومه آورده شود و انتهای آن ویرگول قرار داده شود
 //  سطر آخر نباید ویرگول در انتهای خود داشته باشد، مانند نمونه‌ی زیر. قبل از قراردادن کانفیگ‌های خود، نمونه ها را پاک کنید
+//  **** ONLY VMESS ****
 const myConfigs = [
   // "vmess://....",
   // "vmess://...."
 ]
 
-//  آی‌پی‌های تمیز یا دامین‌های تمیز هر اپراتوری که استفاده می‌کنید را اینجا بنویسید
-//  در صورتی که از اپراتوری استفاده نمی کنید به همین شکل آنها را خالی رها کنید
-//  آی‌پی‌های نوشته شده در بخش همراه اول و سابدامین نوشته شده برای ایرانسل صرفا نمونه میباشند و بایستی پاک شده و اصلاح شوند
-//  در صورتی که از آی‌پی تمیز یا دامین تمیز در انتهای لینک ساب استفاده کنید، این بخش نادیده گرفته خواهد شد
-const cleanIPPerOperator = {
-  AST: [],
-  HWB: [],
-  IRC: [], // ['irc.my-domain.com'],
-  MBT: [],
-  MCI: [], //['162.159.135.87', '162.159.135.88'],
-  MKB: [],
-  PRS: [],
-  RTL: [],
-  SHT: [],
-  ZTL: []
-}
 
-//  به این متغیرها و کدی که در ادامه آمده دست نزنید، مگر اینکه برنامه نویسی جاوا اسکریپت را بلد بوده و دانسته آن را تغییر دهید
+//  ------------------------------------------------------------------------------------------------------------------------------
+//  | به این متغیرها و کدی که در ادامه آمده دست نزنید، مگر اینکه برنامه نویسی جاوا اسکریپت را بلد بوده و دانسته آن را تغییر دهید |
+//  ------------------------------------------------------------------------------------------------------------------------------
+
+const ipProviderLink = "https://raw.githubusercontent.com/vfarid/cf-clean-ips/main/list.json"
 
 const addressList = [
   "discord.com",
   "cloudflare.com",
   "nginx.com",
-  "cdnjs.com"
+  "www.speedtest.com"
 ]
 
 const fpList = [
@@ -88,6 +77,8 @@ const alpnList = [
   "h2,http/1.1"
 ]
 
+var operators = []
+var cleanIPs = []
 var cleanIP = ''
 
 export default {
@@ -97,7 +88,15 @@ export default {
     var type = pathParts[0].toLowerCase()
     if (type == 'sub') {
       if (pathParts[1] !== undefined) {
-        cleanIP = pathParts[1].toLowerCase().trim()
+        if (pathParts[1].includes(".")) { // Subdomain or IP
+          cleanIP = pathParts[1].toLowerCase().trim()
+        } else { // Operator code
+          try {
+            operators = pathParts[1].toUpperCase().trim().split(",")
+            cleanIPs = await fetch(ipProviderLink).then(r => r.json()).then(j => j.ipv4)
+            cleanIPs = cleanIPs.filter(el => operators.includes(el.operator))
+          } catch (e) { console.log(e) }
+        }
       }
 
       var configList = []
@@ -125,28 +124,27 @@ export default {
 
       var ipList = []
       if (cleanIP) {
-        ipList = {GEN: [cleanIP]}
-      } else {
-        ipList = {...cleanIPPerOperator}
-        Object.keys(ipList).forEach((k) => !ipList[k].length && delete ipList[k]);
+        operators = ["GEN"]
+        cleanIPs = [{ip: cleanIP, operator: "GEN"}]
       }
-      if (!Object.keys(ipList).length) {
-        ipList = {COM: ['']}
+      if (!cleanIPs.length) {
+        operators = ["COM"]
+        cleanIPs = [{ip: "", operator: "COM"}]
       }
 
-      for (var code in ipList) {
-        for (var ip of ipList[code]) {
-          finalConfigList = finalConfigList.concat(
-            getMultipleRandomElements(
-              vmessConfigList.map(decodeVmess).map(cnf => mixConfig(cnf, url, "vmess", ip, code)).filter(cnf => (!!cnf && cnf.id)).map(encodeVmess).filter(cnf => !!cnf),
-              maxPerType
-            )
+      for (var operator of operators) {
+        var ipList = cleanIPs.filter(el => el.operator == operator).slice(0, 10)
+        var ip = ipList[Math.floor(Math.random() * ipList.length)].ip
+        finalConfigList = finalConfigList.concat(
+          getMultipleRandomElements(
+            vmessConfigList.map(decodeVmess).map(cnf => mixConfig(cnf, url, "vmess", ip, operator)).filter(cnf => (!!cnf && cnf.id)).map(encodeVmess).filter(cnf => !!cnf),
+            maxPerType
           )
-          if (myConfigs.length) {
-            finalConfigList = finalConfigList.concat(
-              myConfigs.map(decodeVmess).map(cnf => mixConfig(cnf, url, "vmess", ip, code)).filter(cnf => (!!cnf && cnf.id)).map(encodeVmess).filter(cnf => !!cnf)
-            )
-          }
+        )
+        if (myConfigs.length) {
+          finalConfigList = finalConfigList.concat(
+            myConfigs.map(decodeVmess).map(cnf => mixConfig(cnf, url, "vmess", ip, operator)).filter(cnf => (!!cnf && cnf.id)).map(encodeVmess).filter(cnf => !!cnf)
+          )
         }
       }
 
@@ -155,11 +153,11 @@ export default {
         finalConfigList = finalConfigList.concat(getMultipleRandomElements(ssConfigList, maxPerType))
       }
 
-      return new Response(btoa(finalConfigList.join("\n")));
+      return new Response(btoa(finalConfigList.join("\n")))
     } else {
       var url = new URL(request.url)
       var newUrl = new URL("https://" + url.pathname.replace(/^\/|\/$/g, ""))
-      return fetch(new Request(newUrl, request));
+      return fetch(new Request(newUrl, request))
     }
   }
 }
