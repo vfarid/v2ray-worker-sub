@@ -18,8 +18,27 @@ https://my-worker.my-id.workers.dev/sub
 https://my-worker.my-id.workers.dev/sub/mci
 
 لیست کدهای سه حرفی اپراتورها به شرح زیر است:
-mci/mtn/afn/apt/arx/ask/ast/dbn/fnv/hwb/mbt/mkh/prs/psm/rsp/rtl/sht/ztl
-
+کد سه‌حرفی  | اپراتور      
+---         | --- 
+afn         | افرانت       
+apt         | عصر تلکام    
+arx         | آراکس؟       
+ask         | آریس‌تک؟      
+ast         | آسیاتک       
+dbn         | دیده‌بان؟     
+dtk<به‌زودی> | داتک؟        
+fnv         | فن‌آوا        
+hwb         | های‌وب        
+mbt         | مبین‌نت       
+mci         | همراه اول    
+mkh         | مخابرات      
+mtn         | ایرانسل      
+prs         | پارس‌آنلاین    
+psm         | پیشگامان؟    
+rsp         | رسپینا       
+rtl         | رایتل        
+sht         | شاتل         
+ztl <به‌زودی>|زیتل
 می توانید در انتهای لینک، آی‌پی تمیز خود را قراردهید مثل زیر:
 https://my-worker.my-id.workers.dev/sub/162.159.135.87
 
