@@ -17,5 +17,5 @@
   {name: "bardiafa",   type: "raw", url: "https://raw.githubusercontent.com/Bardiafa/Free-V2ray-Config/main/configs.txt"},
   {name: "mahdibland", type: "raw", url: "https://raw.githubusercontent.com/mahdibland/V2RayAggregator/master/sub/splitted/vmess.txt"},
   {name: "mahdibland", type: "raw", url: "https://raw.githubusercontent.com/mahdibland/V2RayAggregator/master/sub/splitted/trojan.txt"},
-  {name: "peasoft",    type: "raw", url: "https://raw.githubusercontent.com/peasoft/NoMoreWalls/master/list_raw.txt"},
+  {name: "peasoft",    type: "raw", url: "https://raw.githubusercontent.com/peasoft/NoMoreWalls/master/list_raw.txt"}
 ]
