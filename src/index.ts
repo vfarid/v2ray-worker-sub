@@ -4,36 +4,30 @@
   * Licensed under GPLv3 (https://github.com/vfarid/v2ray-worker-sub/blob/main/Licence.md)
   */
 
-import { Buffer } from 'buffer'
-
-const MAX_CONFIGS = 400
+const MAX_CONFIGS = 1000
 const INCLUDE_ORIGINAL = true
 
-const subLinks: Record<string, string> = {
-  freefq: "https://raw.githubusercontent.com/freefq/free/master/v2",
-  pawdroid: "https://raw.githubusercontent.com/Pawdroid/Free-servers/main/sub",
-  aiboboxx: "https://raw.githubusercontent.com/aiboboxx/v2rayfree/main/v2",
-  vpei: "https://raw.githubusercontent.com/vpei/Free-Node-Merge/main/o/node.txt",
-  mfuu: "https://raw.githubusercontent.com/mfuu/v2ray/master/v2ray",
-  tbbatbb: "https://raw.githubusercontent.com/tbbatbb/Proxy/master/dist/v2ray.config.txt",
-  auto1: "https://raw.githubusercontent.com/w1770946466/Auto_proxy/main/Long_term_subscription1",
-  auto2: "https://raw.githubusercontent.com/w1770946466/Auto_proxy/main/Long_term_subscription2",
-  // auto3: "https://raw.githubusercontent.com/w1770946466/Auto_proxy/main/Long_term_subscription3",
-  // auto4: "https://raw.githubusercontent.com/w1770946466/Auto_proxy/main/Long_term_subscription4",
-  // auto5: "https://raw.githubusercontent.com/w1770946466/Auto_proxy/main/Long_term_subscription5",
-  // auto6: "https://raw.githubusercontent.com/w1770946466/Auto_proxy/main/Long_term_subscription6",
-  // auto7: "https://raw.githubusercontent.com/w1770946466/Auto_proxy/main/Long_term_subscription7",
-  // auto8: "https://raw.githubusercontent.com/w1770946466/Auto_proxy/main/Long_term_subscription8",
-  ermaozi: "https://raw.githubusercontent.com/ermaozi/get_subscribe/main/subscribe/v2ray.txt",
-  ermaozi01: "https://raw.githubusercontent.com/ermaozi01/free_clash_vpn/main/subscribe/v2ray.txt",
-}
-
-const cnfLinks: Record<string, string> = {
-  bardiafa: "https://raw.githubusercontent.com/Bardiafa/Free-V2ray-Config/main/configs.txt",
-  mahdibland1: "https://raw.githubusercontent.com/mahdibland/V2RayAggregator/master/sub/splitted/vmess.txt",
-  mahdibland2: "https://raw.githubusercontent.com/mahdibland/V2RayAggregator/master/sub/splitted/trojan.txt",
-  peasoft: "https://raw.githubusercontent.com/peasoft/NoMoreWalls/master/list_raw.txt",
-}
+const configProviders: Array<any> = [
+  {name: "freefq",     type: "b64", url: "https://raw.githubusercontent.com/freefq/free/master/v2"},
+  {name: "pawdroid",   type: "b64", url: "https://raw.githubusercontent.com/Pawdroid/Free-servers/main/sub"},
+  {name: "aiboboxx",   type: "b64", url: "https://raw.githubusercontent.com/aiboboxx/v2rayfree/main/v2"},
+  {name: "vpei",       type: "b64", url: "https://raw.githubusercontent.com/vpei/Free-Node-Merge/main/o/node.txt"},
+  {name: "mfuu",       type: "b64", url: "https://raw.githubusercontent.com/mfuu/v2ray/master/v2ray"},
+  {name: "autoproxy",  type: "b64", url: "https://raw.githubusercontent.com/w1770946466/Auto_proxy/main/Long_term_subscription1"},
+  {name: "autoproxy",  type: "b64", url: "https://raw.githubusercontent.com/w1770946466/Auto_proxy/main/Long_term_subscription2"},
+  {name: "autoproxy",  type: "b64", url: "https://raw.githubusercontent.com/w1770946466/Auto_proxy/main/Long_term_subscription3"},
+  {name: "autoproxy",  type: "b64", url: "https://raw.githubusercontent.com/w1770946466/Auto_proxy/main/Long_term_subscription4"},
+  {name: "autoproxy",  type: "b64", url: "https://raw.githubusercontent.com/w1770946466/Auto_proxy/main/Long_term_subscription5"},
+  {name: "autoproxy",  type: "b64", url: "https://raw.githubusercontent.com/w1770946466/Auto_proxy/main/Long_term_subscription6"},
+  {name: "autoproxy",  type: "b64", url: "https://raw.githubusercontent.com/w1770946466/Auto_proxy/main/Long_term_subscription7"},
+  {name: "autoproxy",  type: "b64", url: "https://raw.githubusercontent.com/w1770946466/Auto_proxy/main/Long_term_subscription8"},
+  {name: "ermaozi",    type: "b64", url: "https://raw.githubusercontent.com/ermaozi/get_subscribe/main/subscribe/v2ray.txt"},
+  {name: "ermaozi01",  type: "b64", url: "https://raw.githubusercontent.com/ermaozi01/free_clash_vpn/main/subscribe/v2ray.txt"},
+  {name: "bardiafa",   type: "raw", url: "https://raw.githubusercontent.com/Bardiafa/Free-V2ray-Config/main/configs.txt"},
+  {name: "mahdibland", type: "raw", url: "https://raw.githubusercontent.com/mahdibland/V2RayAggregator/master/sub/splitted/vmess.txt"},
+  {name: "mahdibland", type: "raw", url: "https://raw.githubusercontent.com/mahdibland/V2RayAggregator/master/sub/splitted/trojan.txt"},
+  {name: "peasoft",    type: "raw", url: "https://raw.githubusercontent.com/peasoft/NoMoreWalls/master/list_raw.txt"},
+]
 
 const ipProviderLink = "https://raw.githubusercontent.com/vfarid/cf-clean-ips/main/list.json"
 
@@ -111,38 +105,30 @@ export default {
         maxConfigs = Math.floor(maxConfigs / 2)
       }
 
-      console.log(maxConfigs, includeOriginalConfigs)
-      
-      var configList: Array<string> = []
+      var configList: Array<any> = []
       var acceptableConfigList: Array<any> = []
       var finalConfigList: Array<any> = []
+      var newConfigs: any
 
-      for (const [name, subLink] of Object.entries(subLinks)) {
+      for (const sub of configProviders) {
         try {
-          const newConfigs = await fetch(subLink)
+          newConfigs = await fetch(sub.url)
             .then(r => r.text())
-            .then(a => atob(a))
-            .then(t => t.split("\n"))
-          configList = configList.concat(newConfigs.map((cnf: string) => cnf.trim()))
+          if (sub.type === "b64") {
+            newConfigs = atob(newConfigs)
+          }
+          newConfigs = newConfigs.split("\n")
           acceptableConfigList.push({
-            name: name,
-            configs: newConfigs.filter(cnf => cnf.match(/^(vmess|vless|trojan):\/\//i))
+            name: sub.name,
+            configs: newConfigs.filter((cnf: any) => cnf.match(/^(vmess|vless|trojan):\/\//i))
           })
-        } catch (e) { }
-      }
-
-      for (const [name, cnfLink] of Object.entries(cnfLinks)) {
-        try {
-          const newConfigs = await fetch(cnfLink)
-            .then(r => r.text())
-            .then(t => t.split("\n"))
-
-            configList = configList.concat(newConfigs.map((cnf: string) => cnf.trim()))
-            acceptableConfigList.push({
-              name: name,
-              configs: newConfigs.filter(cnf => cnf.match(/^(vmess|vless|trojan):\/\//))
+          if (includeOriginalConfigs) {
+            configList.push({
+              name: sub.name,
+              configs: newConfigs.filter((cnf: any) => cnf.match(/^(vmess|vless|trojan|ss|ssr):\/\//i))
             })
-          } catch (e) { }
+          }
+        } catch (e) { }
       }
 
       var ipList = []
@@ -159,11 +145,11 @@ export default {
       for (const operator of operators) {
         var ipList = cleanIPs.filter(el => el.operator == operator).slice(0, 5)
         var ip = ipList[Math.floor(Math.random() * ipList.length)].ip
-
         for (const el of acceptableConfigList) {
           finalConfigList = finalConfigList.concat(
             getMultipleRandomElements(
-              el.configs.map(decodeConfig)
+              el.configs
+                .map(decodeConfig)
                 .map((cnf: any) => mixConfig(cnf, url, ip, operator, el.name))
                 .filter((cnf: any) => (!!cnf && cnf.id))
                 .map(encodeConfig)
@@ -172,12 +158,17 @@ export default {
             )
           )
         }
+        if (includeOriginalConfigs) {
+          for (const el of configList) {
+            finalConfigList = finalConfigList.concat(
+              getMultipleRandomElements(
+                el.configs,
+                configPerList
+              )
+            )
+          }
+        }
       }
-      
-      if (includeOriginalConfigs) {
-        finalConfigList = finalConfigList.concat(getMultipleRandomElements(configList, maxConfigs))
-      }
-
       return new Response(btoa(finalConfigList.join("\n")))
     } else if (path) {
       var newUrl = new URL("https://" + url.pathname.replace(/^\/|\/$/g, ""))
@@ -221,30 +212,20 @@ export default {
   }
 }
 
-// function encodeVmess(conf: string): string|null {
-//   try {
-//     return "vmess://" + btoa(JSON.stringify(conf))
-//   } catch {
-//     return null
-//   }
-// }
-
-// function decodeVmess(conf: string): any {
-//   try {
-//     return JSON.parse(atob(conf.substr(8)))
-//   } catch {
-//     return {}
-//   }
-// }
-
 function encodeConfig(conf: any): string|null {
   var configStr: string|null = null
-  if (conf.protocol === "vmess") {
-    delete conf.protocol
-    configStr = "vmess://" + btoa(JSON.stringify(conf))
-  } else if (["vless", "trojan"].includes(conf.protocol)) {
-    configStr = `${conf.protocol}://${conf.id}@${conf.add}:${conf.port}?security=${conf.tls}&type=${conf.type}&path=${encodeURIComponent(conf.path)}&host=${encodeURIComponent(conf.host)}&tls=${conf.tls}&sni=${conf.sni}#${encodeURIComponent(conf.ps)}`;
+  
+  try {
+    if (conf.protocol === "vmess") {
+      delete conf.protocol
+      configStr = "vmess://" + btoa(JSON.stringify(conf))
+    } else if (["vless", "trojan"].includes(conf?.protocol)) {
+      configStr = `${conf.protocol}://${conf.id}@${conf.add}:${conf.port}?security=${conf.tls}&type=${conf.type}&path=${encodeURIComponent(conf.path)}&host=${encodeURIComponent(conf.host)}&tls=${conf.tls}&sni=${conf.sni}#${encodeURIComponent(conf.ps)}`;
+    }
+  } catch (e) {
+    console.log(`Failed to encode ${JSON.stringify(conf)}`, e)
   }
+
   return configStr
 }
 
@@ -267,27 +248,26 @@ function decodeConfig(configStr: string): any {
         protocol: match.groups.protocol,
         id: match.groups.id,
         add: match.groups?.add,
-        port: match.groups?.port,
-        ps: match.groups.ps,
-        type: optionsObj.type ?? 'tcp',
-        host: optionsObj.host,
-        path: optionsObj.path,
-        security: optionsObj.security ?? 'none',
-        sni: optionsObj.sni,
-        alpn: optionsObj.alpn,
+        port: match.groups.port ?? 443,
+        ps: match.groups?.ps,
+        type: optionsObj.type ?? "tcp",
+        host: optionsObj?.host,
+        path: optionsObj?.path,
+        tls: optionsObj.security ?? "none",
+        sni: optionsObj?.sni,
+        alpn: optionsObj?.alpn,
       }
     } catch (e) {
-      console.log(e)
-      return null
+      console.log(`Failed to decode ${configStr}`, e)
     }
-  } else {
-    return null
   }
+  return conf
 }
 
 function mixConfig(conf: any, url: URL, ip: string, operator: string, provider = "") {
   try {
     if (conf.tls != "tls") {
+      console.log(`notls ${JSON.stringify(conf)}`)
       return {}
     }
 
@@ -300,6 +280,7 @@ function mixConfig(conf: any, url: URL, ip: string, operator: string, provider =
       }
     }
     if (!addr) {
+      console.log(`noaddress ${JSON.stringify(conf)}`)
       return {}
     }
 
@@ -330,13 +311,13 @@ function mixConfig(conf: any, url: URL, ip: string, operator: string, provider =
       conf.path = path
     }
 
-    conf.name = conf?.name ? conf.name : conf.ps
+    conf.ps = (Math.random() + 1).toString(36).substring(3) //conf?.ps ? conf.ps : conf.name
     if (provider) {
-      conf.name = provider + "-" + conf.name
+      conf.ps = provider + "-" + conf.ps
     }
 
-    conf.name = conf.name + "-worker-" + operator.toLocaleLowerCase()
-    conf.ps = conf.name
+    conf.ps = conf.ps + "-worker-" + operator.toLocaleLowerCase()
+    conf.name = conf.ps
     conf.sni = url.hostname
     if (ip) {
       conf.add = ip
@@ -348,12 +329,13 @@ function mixConfig(conf: any, url: URL, ip: string, operator: string, provider =
       conf.host = addr
     }
 
-    conf.path = "/" + addr + ":" + conf.port + "/" + conf?.path.replace(/^\//g, "")
+    conf.path = "/" + addr + ":" + conf.port + (conf?.path ? "/" + conf.path.replace(/^\//g, "") : "")
     conf.fp = fpList[Math.floor(Math.random() * fpList.length)]
     conf.alpn = alpnList[Math.floor(Math.random() * alpnList.length)]
     conf.port = 443
     return conf
   } catch (e) {
+    console.log(`Failed to merge config ${JSON.stringify(conf)}`, e)
     return {}
   }
 }
@@ -361,6 +343,17 @@ function mixConfig(conf: any, url: URL, ip: string, operator: string, provider =
 function getMultipleRandomElements(arr: Array<any>, num: number) {
   var shuffled = [...arr].sort(() => 0.5 - Math.random())
   return shuffled.slice(0, num)
+
+  const result: Array<any> = [];
+  const range = Array.from({length: arr.length}, (_, i) => i);
+
+  for (var i = 0; i < num; i++) {
+    const n = Math.floor(Math.random() * range.length);
+    const index = range.splice(n, 1)[0];
+    result.push(arr[index]);
+  }
+
+  return result;
 }
 
 function isIp(str: string) {
@@ -377,4 +370,3 @@ function isIp(str: string) {
   } catch (e) { }
   return false
 }
-
