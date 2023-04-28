@@ -1,32 +1,52 @@
 /*!
-  * v2ray Subscription Worker v1.4
+  * v2ray Subscription Worker v1.5
   * Copyright 2023 Vahid Farid (https://twitter.com/vahidfarid)
   * Licensed under GPLv3 (https://github.com/vfarid/v2ray-worker-sub/blob/main/Licence.md)
   */
 
-const maxConfigs = 100
-const includeOriginalConfigs = 0
-const onlyUseMyConfigs = 0
-const subLinks = {
-  // freefq: "https://raw.githubusercontent.com/freefq/free/master/v2",
-  // pawdroid: "https://raw.githubusercontent.com/Pawdroid/Free-servers/main/sub",
-  // aiboboxx: "https://raw.githubusercontent.com/aiboboxx/v2rayfree/main/v2",
-  // azadnetch: "https://raw.githubusercontent.com/AzadNetCH/Clash/main/V2Ray.txt",
+import { Buffer } from 'buffer'
+
+const MAX_CONFIGS = 400
+const INCLUDE_ORIGINAL = true
+
+const subLinks: Record<string, string> = {
+  freefq: "https://raw.githubusercontent.com/freefq/free/master/v2",
+  pawdroid: "https://raw.githubusercontent.com/Pawdroid/Free-servers/main/sub",
+  aiboboxx: "https://raw.githubusercontent.com/aiboboxx/v2rayfree/main/v2",
   vpei: "https://raw.githubusercontent.com/vpei/Free-Node-Merge/main/o/node.txt",
   mfuu: "https://raw.githubusercontent.com/mfuu/v2ray/master/v2ray",
+  tbbatbb: "https://raw.githubusercontent.com/tbbatbb/Proxy/master/dist/v2ray.config.txt",
+  auto1: "https://raw.githubusercontent.com/w1770946466/Auto_proxy/main/Long_term_subscription1",
+  auto2: "https://raw.githubusercontent.com/w1770946466/Auto_proxy/main/Long_term_subscription2",
+  // auto3: "https://raw.githubusercontent.com/w1770946466/Auto_proxy/main/Long_term_subscription3",
+  // auto4: "https://raw.githubusercontent.com/w1770946466/Auto_proxy/main/Long_term_subscription4",
+  // auto5: "https://raw.githubusercontent.com/w1770946466/Auto_proxy/main/Long_term_subscription5",
+  // auto6: "https://raw.githubusercontent.com/w1770946466/Auto_proxy/main/Long_term_subscription6",
+  // auto7: "https://raw.githubusercontent.com/w1770946466/Auto_proxy/main/Long_term_subscription7",
+  // auto8: "https://raw.githubusercontent.com/w1770946466/Auto_proxy/main/Long_term_subscription8",
+  ermaozi: "https://raw.githubusercontent.com/ermaozi/get_subscribe/main/subscribe/v2ray.txt",
+  ermaozi01: "https://raw.githubusercontent.com/ermaozi01/free_clash_vpn/main/subscribe/v2ray.txt",
 }
-const cnfLinks = {
-  mahdibland: "https://raw.githubusercontent.com/mahdibland/ShadowsocksAggregator/master/sub/sub_merge.txt",
-  // awesomevpn: "https://raw.githubusercontent.com/awesome-vpn/awesome-vpn/master/all",
+
+const cnfLinks: Record<string, string> = {
+  bardiafa: "https://raw.githubusercontent.com/Bardiafa/Free-V2ray-Config/main/configs.txt",
+  mahdibland1: "https://raw.githubusercontent.com/mahdibland/V2RayAggregator/master/sub/splitted/vmess.txt",
+  mahdibland2: "https://raw.githubusercontent.com/mahdibland/V2RayAggregator/master/sub/splitted/trojan.txt",
+  peasoft: "https://raw.githubusercontent.com/peasoft/NoMoreWalls/master/list_raw.txt",
 }
-const myConfigs: Array<string> = []
+
 const ipProviderLink = "https://raw.githubusercontent.com/vfarid/cf-clean-ips/main/list.json"
 
 const addressList = [
   "discord.com",
   "cloudflare.com",
   "nginx.com",
-  "www.speedtest.com"
+  "www.speedtest.com",
+  "laravel.com",
+  "chat.openai.com",
+  "auth0.openai.com",
+  "codepen.io",
+  "api.jquery.com"
 ]
 
 const fpList = [
@@ -48,23 +68,25 @@ const alpnList = [
   "h2,http/1.1"
 ]
 
-var operators: Array<any> = []
+var operators: Array<string> = []
 var cleanIPs: Array<any> = []
-var cleanIP = ''
-
+var cleanIP: string = ""
+var maxConfigs: number = MAX_CONFIGS
+var includeOriginalConfigs: boolean = INCLUDE_ORIGINAL
 
 export default {
   async fetch(request: Request): Promise<Response> {
-    var url = new URL(request.url)
-    var pathParts = url.pathname.replace(/^\/|\/$/g, "").split("/")
-    var type = pathParts[0].toLowerCase()
-    if (type == 'sub') {
-      if (pathParts[1] !== undefined) {
-        if (pathParts[1].includes(".")) { // Subdomain or IP
-          cleanIP = pathParts[1].toLowerCase().trim()
+    const url = new URL(request.url)
+    const path = url.pathname.replace(/^\/|\/$/g, "")
+    const parts = path.split("/")
+    const type = parts[0].toLowerCase()
+    if (type === "sub") {
+      if (parts[1] !== undefined) {
+        if (parts[1].includes(".")) { // Subdomain or IP
+          cleanIP = parts[1].toLowerCase().trim()
         } else { // Operator code
           try {
-            operators = pathParts[1].toUpperCase().trim().split(",")
+            operators = parts[1].toUpperCase().trim().split(",")
             cleanIPs = await fetch(ipProviderLink)
               .then((r: Response) => r.json())
               .then((j: any) => j.ipv4)
@@ -73,78 +95,82 @@ export default {
         }
       }
 
+      if (url.searchParams.has('max')) {
+        maxConfigs = parseInt(url.searchParams.get('max') as string)
+        if (!maxConfigs) {
+          maxConfigs = MAX_CONFIGS
+        }
+      }
+
+      if (url.searchParams.has('original')) {
+        const original = url.searchParams.get('original') as string
+        includeOriginalConfigs = ["1", "true", "yes", "y"].includes(original.toLowerCase())
+      }
+
+      if (includeOriginalConfigs) {
+        maxConfigs = Math.floor(maxConfigs / 2)
+      }
+
+      console.log(maxConfigs, includeOriginalConfigs)
+      
       var configList: Array<string> = []
-      var vmessConfigList: Array<any> = []
+      var acceptableConfigList: Array<any> = []
       var finalConfigList: Array<any> = []
-      if (!onlyUseMyConfigs) {
-        for (const [name, subLink] of Object.entries(subLinks)) {
-          try {
-            const newConfigs = await fetch(subLink)
-              .then(r => r.text())
-              .then(a => atob(a))
-              .then(t => t.split("\n"))
-            
-            configList = configList.concat(newConfigs)
-            vmessConfigList.push({
+
+      for (const [name, subLink] of Object.entries(subLinks)) {
+        try {
+          const newConfigs = await fetch(subLink)
+            .then(r => r.text())
+            .then(a => atob(a))
+            .then(t => t.split("\n"))
+          configList = configList.concat(newConfigs.map((cnf: string) => cnf.trim()))
+          acceptableConfigList.push({
+            name: name,
+            configs: newConfigs.filter(cnf => cnf.match(/^(vmess|vless|trojan):\/\//i))
+          })
+        } catch (e) { }
+      }
+
+      for (const [name, cnfLink] of Object.entries(cnfLinks)) {
+        try {
+          const newConfigs = await fetch(cnfLink)
+            .then(r => r.text())
+            .then(t => t.split("\n"))
+
+            configList = configList.concat(newConfigs.map((cnf: string) => cnf.trim()))
+            acceptableConfigList.push({
               name: name,
-              configs: newConfigs.filter(cnf => (cnf.search("vmess://") == 0))
+              configs: newConfigs.filter(cnf => cnf.match(/^(vmess|vless|trojan):\/\//))
             })
           } catch (e) { }
-        }
-
-        for (const [name, cnfLink] of Object.entries(cnfLinks)) {
-          try {
-            const newConfigs = await fetch(cnfLink)
-              .then(r => r.text())
-              .then(t => t.split("\n"))
-
-              configList = configList.concat(newConfigs)
-              vmessConfigList.push({
-                name: name,
-                configs: newConfigs.filter(cnf => (cnf.search("vmess://") == 0))
-              })
-            } catch (e) { }
-        }
       }
 
       var ipList = []
       if (cleanIP) {
-        operators = ["GEN"]
-        cleanIPs = [{ip: cleanIP, operator: "GEN"}]
+        operators = ["IP"]
+        cleanIPs = [{ip: cleanIP, operator: "IP"}]
       }
       if (!cleanIPs.length) {
-        operators = ["COM"]
-        cleanIPs = [{ip: "", operator: "COM"}]
+        operators = ["General"]
+        cleanIPs = [{ip: "", operator: "General"}]
       }
 
-      const configPerList = Math.ceil(maxConfigs / vmessConfigList.length)
+      const configPerList = Math.ceil(maxConfigs / acceptableConfigList.length)
       for (const operator of operators) {
-        var ipList = cleanIPs.filter(el => el.operator == operator).slice(0, 10)
+        var ipList = cleanIPs.filter(el => el.operator == operator).slice(0, 5)
         var ip = ipList[Math.floor(Math.random() * ipList.length)].ip
 
-        for (const el of vmessConfigList) {
+        for (const el of acceptableConfigList) {
           finalConfigList = finalConfigList.concat(
             getMultipleRandomElements(
-              el.configs.map(decodeVmess)
-                .map((cnf: any) => mixConfig(cnf, url, "vmess", ip, operator, el.name))
+              el.configs.map(decodeConfig)
+                .map((cnf: any) => mixConfig(cnf, url, ip, operator, el.name))
                 .filter((cnf: any) => (!!cnf && cnf.id))
-                .map(encodeVmess)
+                .map(encodeConfig)
                 .filter((cnf: any) => !!cnf),
               configPerList
             )
           )
-        }
-
-        if (myConfigs.length) {
-          var myMergedConfigs: Array<any>
-          myMergedConfigs = myConfigs.filter((cnf: string) => cnf.startsWith("vmess://"))
-            .map(decodeVmess)
-            .map(cnf => mixConfig(cnf, url, "vmess", ip, operator))
-            .filter(cnf => (!!cnf && cnf.id))
-            .map(encodeVmess)
-            .filter(cnf => !!cnf)
-
-          finalConfigList = finalConfigList.concat(myMergedConfigs)
         }
       }
       
@@ -153,31 +179,113 @@ export default {
       }
 
       return new Response(btoa(finalConfigList.join("\n")))
-    } else {
-      var url = new URL(request.url)
+    } else if (path) {
       var newUrl = new URL("https://" + url.pathname.replace(/^\/|\/$/g, ""))
       return fetch(new Request(newUrl, request))
+    } else {
+      return new Response(`\
+<!DOCTYPE html>
+<body dir="rtl">
+  <h3><font color="green">همه چی درسته</font></h3>
+  <p />
+  <p>
+    این لینک sub را در اپ v2ray خود کپی کنید:
+  </p>
+  <p>
+    <a href="https://${url.hostname}/sub">https://${url.hostname}/sub</a>
+  </p>
+  <p>
+    و یا همین لینک را همراه آی‌پی تمیز در اپ خود اضافه کنید:
+  </p>
+  <p>
+    <a href="https://${url.hostname}/sub/1.2.3.4">https://${url.hostname}/sub/1.2.3.4</a>
+  </p>
+  <p>
+    می‌توانید با متغیر max تعداد کانفیگ را مشخص کنید:
+  </p>
+  <p>
+    <a href="https://${url.hostname}/sub/1.2.3.4?max=200">https://${url.hostname}/sub/1.2.3.4?max=200</a>
+  </p>
+  <p>
+    همچنین می‌توانید با متغیر original مشخص کنید که کانفیگ‌های ترکیب نشده با ورکر هم در خروجی آورده شوند:
+  </p>
+  <p>
+    <a href="https://${url.hostname}/sub/1.2.3.4?max=200&original=1">https://${url.hostname}/sub/1.2.3.4?max=200&original=1</a>
+  </p>
+</body>`, {
+        headers: {
+          "content-type": "text/html;charset=UTF-8",
+        },
+      })
     }
   }
 }
 
-function encodeVmess(conf: string): string|null {
-  try {
-    return "vmess://" + btoa(JSON.stringify(conf))
-  } catch {
+// function encodeVmess(conf: string): string|null {
+//   try {
+//     return "vmess://" + btoa(JSON.stringify(conf))
+//   } catch {
+//     return null
+//   }
+// }
+
+// function decodeVmess(conf: string): any {
+//   try {
+//     return JSON.parse(atob(conf.substr(8)))
+//   } catch {
+//     return {}
+//   }
+// }
+
+function encodeConfig(conf: any): string|null {
+  var configStr: string|null = null
+  if (conf.protocol === "vmess") {
+    delete conf.protocol
+    configStr = "vmess://" + btoa(JSON.stringify(conf))
+  } else if (["vless", "trojan"].includes(conf.protocol)) {
+    configStr = `${conf.protocol}://${conf.id}@${conf.add}:${conf.port}?security=${conf.tls}&type=${conf.type}&path=${encodeURIComponent(conf.path)}&host=${encodeURIComponent(conf.host)}&tls=${conf.tls}&sni=${conf.sni}#${encodeURIComponent(conf.ps)}`;
+  }
+  return configStr
+}
+
+function decodeConfig(configStr: string): any {
+  var match: any = null
+  var conf: any = null
+  if (configStr.startsWith("vmess://")) {
+    conf = JSON.parse(atob(configStr.substring(8)))
+    conf.protocol = "vmess"
+  } else if (match = configStr.match(/^(?<protocol>trojan|vless):\/\/(?<id>.*)@(?<add>.*):(?<port>\d+)\??(?<options>.*)#(?<ps>.*)$/)) {
+    try {
+      const optionsArr = match.groups.options.split('&') ?? []
+      const optionsObj = optionsArr.reduce((obj: Record<string, string>, option: string) => {
+        const [key, value] = option.split('=')
+        obj[key] = decodeURIComponent(value)
+        return obj
+      }, {} as Record<string, string>)
+
+      conf = {
+        protocol: match.groups.protocol,
+        id: match.groups.id,
+        add: match.groups?.add,
+        port: match.groups?.port,
+        ps: match.groups.ps,
+        type: optionsObj.type ?? 'tcp',
+        host: optionsObj.host,
+        path: optionsObj.path,
+        security: optionsObj.security ?? 'none',
+        sni: optionsObj.sni,
+        alpn: optionsObj.alpn,
+      }
+    } catch (e) {
+      console.log(e)
+      return null
+    }
+  } else {
     return null
   }
 }
 
-function decodeVmess(conf: string): any {
-  try {
-    return JSON.parse(atob(conf.substr(8)))
-  } catch {
-    return {}
-  }
-}
-
-function mixConfig(conf: any, url: URL, protocol: string, ip: string, operator: string, provider = "") {
+function mixConfig(conf: any, url: URL, ip: string, operator: string, provider = "") {
   try {
     if (conf.tls != "tls") {
       return {}
@@ -222,16 +330,11 @@ function mixConfig(conf: any, url: URL, protocol: string, ip: string, operator: 
       conf.path = path
     }
 
-    if (conf.net.toLocaleLowerCase() == "ws") {
-      conf.pingurl = `wss://${addr}:${conf.port}/${conf.path.replace(/^\//g, "")}`
-    } else {
-      conf.pingurl = `https://${addr}:${conf.port}/${conf.path.replace(/^\//g, "")}`
-    }
-
-    conf.name = conf.name ? conf.name : conf.ps
+    conf.name = conf?.name ? conf.name : conf.ps
     if (provider) {
       conf.name = provider + "-" + conf.name
     }
+
     conf.name = conf.name + "-worker-" + operator.toLocaleLowerCase()
     conf.ps = conf.name
     conf.sni = url.hostname
@@ -241,52 +344,18 @@ function mixConfig(conf: any, url: URL, protocol: string, ip: string, operator: 
       conf.add = addressList[Math.floor(Math.random() * addressList.length)]
     }
 
-    if (protocol == "vmess") {
-      conf.sni = url.hostname
-      conf.host = url.hostname
-      if (conf.path == undefined) {
-        conf.path = ""
-      }
-      conf.path = "/" + addr + ":" + conf.port + "/" + conf.path.replace(/^\//g, "")
-      conf.fp = fpList[Math.floor(Math.random() * fpList.length)]
-      conf.alpn = alpnList[Math.floor(Math.random() * alpnList.length)]
-      conf.port = 443
+    if (!conf?.host) {
+      conf.host = addr
     }
+
+    conf.path = "/" + addr + ":" + conf.port + "/" + conf?.path.replace(/^\//g, "")
+    conf.fp = fpList[Math.floor(Math.random() * fpList.length)]
+    conf.alpn = alpnList[Math.floor(Math.random() * alpnList.length)]
+    conf.port = 443
     return conf
   } catch (e) {
     return {}
   }
-}
-
-async function tcpPing(url: string, timeout: number) {
-  try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), timeout);
-    const response = await fetch(url, { method: 'HEAD', signal: controller.signal });
-    clearTimeout(timeoutId);
-    return response.ok;
-  } catch (e) {
-    return false;
-  }
-}
-
-async function wsPing(url: string, timeout: number) {
-  return new Promise((resolve) => {
-    const socket = new WebSocket(url);
-    const timeoutId = setTimeout(() => {
-      socket.close();
-      resolve(false);
-    }, timeout);
-    socket.addEventListener('open', () => {
-      clearTimeout(timeoutId);
-      socket.close();
-      resolve(true);
-    });
-    socket.addEventListener('error', () => {
-      clearTimeout(timeoutId);
-      resolve(false);
-    });
-  });
 }
 
 function getMultipleRandomElements(arr: Array<any>, num: number) {
