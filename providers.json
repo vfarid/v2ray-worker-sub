@@ -1,0 +1,21 @@
+[
+  {"name": "freefq",     "type": "b64", "url": "https://raw.githubusercontent.com/freefq/free/master/v2"},
+  {"name": "pawdroid",   "type": "b64", "url": "https://raw.githubusercontent.com/Pawdroid/Free-servers/main/sub"},
+  {"name": "aiboboxx",   "type": "b64", "url": "https://raw.githubusercontent.com/aiboboxx/v2rayfree/main/v2"},
+  {"name": "vpei",       "type": "b64", "url": "https://raw.githubusercontent.com/vpei/Free-Node-Merge/main/o/node.txt"},
+  {"name": "mfuu",       "type": "b64", "url": "https://raw.githubusercontent.com/mfuu/v2ray/master/v2ray"},
+  {"name": "autoproxy",  "type": "b64", "url": "https://raw.githubusercontent.com/w1770946466/Auto_proxy/main/Long_term_subscription1"},
+  {"name": "autoproxy",  "type": "b64", "url": "https://raw.githubusercontent.com/w1770946466/Auto_proxy/main/Long_term_subscription2"},
+  {"name": "autoproxy",  "type": "b64", "url": "https://raw.githubusercontent.com/w1770946466/Auto_proxy/main/Long_term_subscription3"},
+  {"name": "autoproxy",  "type": "b64", "url": "https://raw.githubusercontent.com/w1770946466/Auto_proxy/main/Long_term_subscription4"},
+  {"name": "autoproxy",  "type": "b64", "url": "https://raw.githubusercontent.com/w1770946466/Auto_proxy/main/Long_term_subscription5"},
+  {"name": "autoproxy",  "type": "b64", "url": "https://raw.githubusercontent.com/w1770946466/Auto_proxy/main/Long_term_subscription6"},
+  {"name": "autoproxy",  "type": "b64", "url": "https://raw.githubusercontent.com/w1770946466/Auto_proxy/main/Long_term_subscription7"},
+  {"name": "autoproxy",  "type": "b64", "url": "https://raw.githubusercontent.com/w1770946466/Auto_proxy/main/Long_term_subscription8"},
+  {"name": "ermaozi",    "type": "b64", "url": "https://raw.githubusercontent.com/ermaozi/get_subscribe/main/subscribe/v2ray.txt"},
+  {"name": "ermaozi01",  "type": "b64", "url": "https://raw.githubusercontent.com/ermaozi01/free_clash_vpn/main/subscribe/v2ray.txt"},
+  {"name": "bardiafa",   "type": "raw", "url": "https://raw.githubusercontent.com/Bardiafa/Free-V2ray-Config/main/configs.txt"},
+  {"name": "mahdibland", "type": "raw", "url": "https://raw.githubusercontent.com/mahdibland/V2RayAggregator/master/sub/splitted/vmess.txt"},
+  {"name": "mahdibland", "type": "raw", "url": "https://raw.githubusercontent.com/mahdibland/V2RayAggregator/master/sub/splitted/trojan.txt"},
+  {"name": "peasoft",    "type": "raw", "url": "https://raw.githubusercontent.com/peasoft/NoMoreWalls/master/list_raw.txt"}
+]
