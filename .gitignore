@@ -169,3 +169,4 @@ out
 
 .dev.vars
 *.map
+package-lock.json
