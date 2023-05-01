@@ -1,10 +1,10 @@
 /*!
-  * v2ray Subscription Worker v1.5
+  * v2ray Subscription Worker v1.6
   * Copyright 2023 Vahid Farid (https://twitter.com/vahidfarid)
   * Licensed under GPLv3 (https://github.com/vfarid/v2ray-worker-sub/blob/main/Licence.md)
   */
 
-const MAX_CONFIGS = 500
+const MAX_CONFIGS = 1000
 const INCLUDE_ORIGINAL = true
 
 const configProviders: Array<any> = [
@@ -55,7 +55,7 @@ const configProviders: Array<any> = [
     name: "bardiafa",
     type: "raw",
     urls: [
-      "https://raw.githubusercontent.com/Bardiafa/Free-V2ray-Config/main/configs.txt",
+      "https://raw.githubusercontent.com/Bardiafa/Free-V2ray-Config/main/All_Configs_Sub.txt",
     ],
   },
   {
@@ -161,6 +161,10 @@ export default {
       if (url.searchParams.has('original')) {
         const original = url.searchParams.get('original') as string
         includeOriginalConfigs = ["1", "true", "yes", "y"].includes(original.toLowerCase())
+      }
+
+      if (includeOriginalConfigs) {
+        maxConfigs = Math.floor(maxConfigs / 2)
       }
 
       var configList: Array<any> = []
@@ -316,8 +320,10 @@ function decodeConfig(configStr: string): any {
   var match: any = null
   var conf: any = null
   if (configStr.startsWith("vmess://")) {
-    conf = JSON.parse(Buffer.from(configStr.substring(8), "base64").toString("utf-8"))
-    conf.protocol = "vmess"
+    try {
+      conf = JSON.parse(Buffer.from(configStr.substring(8), "base64").toString("utf-8"))
+      conf.protocol = "vmess"
+    } catch (e) { }
   } else if (match = configStr.match(/^(?<protocol>trojan|vless):\/\/(?<id>.*)@(?<add>.*):(?<port>\d+)\??(?<options>.*)#(?<ps>.*)$/)) {
     try {
       const optionsArr = match.groups.options.split('&') ?? []
