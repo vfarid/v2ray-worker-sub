@@ -1,8 +1,91 @@
 /*!
-  * v2ray Subscription Worker v1.5
+  * v2ray Subscription Worker v1.6
   * Copyright 2023 Vahid Farid (https://twitter.com/vahidfarid)
   * Licensed under GPLv3 (https://github.com/vfarid/v2ray-worker-sub/blob/main/Licence.md)
   */
+
+var MAX_CONFIGS = 1000;
+var INCLUDE_ORIGINAL = true;
+var configProviders = [
+  {
+    name: "vpei",
+    type: "b64",
+    urls: [
+      "https://raw.githubusercontent.com/vpei/Free-Node-Merge/main/o/node.txt"
+    ]
+  },
+  {
+    name: "mfuu",
+    type: "b64",
+    urls: [
+      "https://raw.githubusercontent.com/mfuu/v2ray/master/v2ray"
+    ]
+  },
+  {
+    name: "peasoft",
+    type: "raw",
+    urls: [
+      "https://raw.githubusercontent.com/peasoft/NoMoreWalls/master/list_raw.txt"
+    ]
+  },
+  {
+    name: "ermaozi",
+    type: "b64",
+    urls: [
+      "https://raw.githubusercontent.com/ermaozi/get_subscribe/main/subscribe/v2ray.txt"
+    ]
+  },
+  {
+    name: "aiboboxx",
+    type: "b64",
+    urls: [
+      "https://raw.githubusercontent.com/aiboboxx/v2rayfree/main/v2"
+    ]
+  },
+  {
+    name: "mahdibland",
+    type: "raw",
+    urls: [
+      "https://raw.githubusercontent.com/mahdibland/V2RayAggregator/master/sub/splitted/vmess.txt",
+      "https://raw.githubusercontent.com/mahdibland/V2RayAggregator/master/sub/splitted/trojan.txt"
+    ]
+  },
+  {
+    name: "bardiafa",
+    type: "raw",
+    urls: [
+      "https://raw.githubusercontent.com/Bardiafa/Free-V2ray-Config/main/All_Configs_Sub.txt"
+    ]
+  },
+  {
+    name: "autoproxy",
+    type: "b64",
+    urls: [
+      "https://raw.githubusercontent.com/w1770946466/Auto_proxy/main/Long_term_subscription1",
+      "https://raw.githubusercontent.com/w1770946466/Auto_proxy/main/Long_term_subscription2",
+      "https://raw.githubusercontent.com/w1770946466/Auto_proxy/main/Long_term_subscription3",
+      "https://raw.githubusercontent.com/w1770946466/Auto_proxy/main/Long_term_subscription4",
+      "https://raw.githubusercontent.com/w1770946466/Auto_proxy/main/Long_term_subscription5",
+      "https://raw.githubusercontent.com/w1770946466/Auto_proxy/main/Long_term_subscription6",
+      "https://raw.githubusercontent.com/w1770946466/Auto_proxy/main/Long_term_subscription7",
+      "https://raw.githubusercontent.com/w1770946466/Auto_proxy/main/Long_term_subscription8"
+    ]
+  },
+  {
+    name: "freefq",
+    type: "b64",
+    urls: [
+      "https://raw.githubusercontent.com/freefq/free/master/v2"
+    ]
+  },
+  {
+    name: "pawdroid",
+    type: "b64",
+    urls: [
+      "https://raw.githubusercontent.com/Pawdroid/Free-servers/main/sub"
+    ]
+  }
+];
 
 var __create = Object.create;
 var __defProp = Object.defineProperty;
@@ -1907,88 +1990,7 @@ var require_buffer = __commonJS({
 
 // src/index.ts
 var import_buffer = __toESM(require_buffer(), 1);
-var MAX_CONFIGS = 500;
-var INCLUDE_ORIGINAL = true;
-var configProviders = [
-  {
-    name: "vpei",
-    type: "b64",
-    urls: [
-      "https://raw.githubusercontent.com/vpei/Free-Node-Merge/main/o/node.txt"
-    ]
-  },
-  {
-    name: "mfuu",
-    type: "b64",
-    urls: [
-      "https://raw.githubusercontent.com/mfuu/v2ray/master/v2ray"
-    ]
-  },
-  {
-    name: "peasoft",
-    type: "raw",
-    urls: [
-      "https://raw.githubusercontent.com/peasoft/NoMoreWalls/master/list_raw.txt"
-    ]
-  },
-  {
-    name: "ermaozi",
-    type: "b64",
-    urls: [
-      "https://raw.githubusercontent.com/ermaozi/get_subscribe/main/subscribe/v2ray.txt"
-    ]
-  },
-  {
-    name: "aiboboxx",
-    type: "b64",
-    urls: [
-      "https://raw.githubusercontent.com/aiboboxx/v2rayfree/main/v2"
-    ]
-  },
-  {
-    name: "mahdibland",
-    type: "raw",
-    urls: [
-      "https://raw.githubusercontent.com/mahdibland/V2RayAggregator/master/sub/splitted/vmess.txt",
-      "https://raw.githubusercontent.com/mahdibland/V2RayAggregator/master/sub/splitted/trojan.txt"
-    ]
-  },
-  {
-    name: "bardiafa",
-    type: "raw",
-    urls: [
-      "https://raw.githubusercontent.com/Bardiafa/Free-V2ray-Config/main/configs.txt"
-    ]
-  },
-  {
-    name: "autoproxy",
-    type: "b64",
-    urls: [
-      "https://raw.githubusercontent.com/w1770946466/Auto_proxy/main/Long_term_subscription1",
-      "https://raw.githubusercontent.com/w1770946466/Auto_proxy/main/Long_term_subscription2",
-      "https://raw.githubusercontent.com/w1770946466/Auto_proxy/main/Long_term_subscription3",
-      "https://raw.githubusercontent.com/w1770946466/Auto_proxy/main/Long_term_subscription4",
-      "https://raw.githubusercontent.com/w1770946466/Auto_proxy/main/Long_term_subscription5",
-      "https://raw.githubusercontent.com/w1770946466/Auto_proxy/main/Long_term_subscription6",
-      "https://raw.githubusercontent.com/w1770946466/Auto_proxy/main/Long_term_subscription7",
-      "https://raw.githubusercontent.com/w1770946466/Auto_proxy/main/Long_term_subscription8"
-    ]
-  },
-  {
-    name: "freefq",
-    type: "b64",
-    urls: [
-      "https://raw.githubusercontent.com/freefq/free/master/v2"
-    ]
-  },
-  {
-    name: "pawdroid",
-    type: "b64",
-    urls: [
-      "https://raw.githubusercontent.com/Pawdroid/Free-servers/main/sub"
-    ]
-  }
-];
+
 var ipProviderLink = "https://raw.githubusercontent.com/vfarid/cf-clean-ips/main/list.json";
 var addressList = [
   "discord.com",
@@ -2053,6 +2055,9 @@ var src_default = {
       if (url.searchParams.has("original")) {
         const original = url.searchParams.get("original");
         includeOriginalConfigs = ["1", "true", "yes", "y"].includes(original.toLowerCase());
+      }
+      if (includeOriginalConfigs) {
+        maxConfigs = Math.floor(maxConfigs / 2);
       }
       var configList = [];
       var acceptableConfigList = [];
@@ -2188,8 +2193,11 @@ function decodeConfig(configStr) {
   var match = null;
   var conf = null;
   if (configStr.startsWith("vmess://")) {
-    conf = JSON.parse(import_buffer.Buffer.from(configStr.substring(8), "base64").toString("utf-8"));
-    conf.protocol = "vmess";
+    try {
+      conf = JSON.parse(import_buffer.Buffer.from(configStr.substring(8), "base64").toString("utf-8"));
+      conf.protocol = "vmess";
+    } catch (e) {
+    }
   } else if (match = configStr.match(/^(?<protocol>trojan|vless):\/\/(?<id>.*)@(?<add>.*):(?<port>\d+)\??(?<options>.*)#(?<ps>.*)$/)) {
     try {
       const optionsArr = match.groups.options.split("&") ?? [];
