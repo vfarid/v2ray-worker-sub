@@ -4,88 +4,11 @@
   * Licensed under GPLv3 (https://github.com/vfarid/v2ray-worker-sub/blob/main/Licence.md)
   */
 
-var MAX_CONFIGS = 1000;
-var INCLUDE_ORIGINAL = true;
-var configProviders = [
-  {
-    name: "vpei",
-    type: "b64",
-    urls: [
-      "https://raw.githubusercontent.com/vpei/Free-Node-Merge/main/o/node.txt"
-    ]
-  },
-  {
-    name: "mfuu",
-    type: "b64",
-    urls: [
-      "https://raw.githubusercontent.com/mfuu/v2ray/master/v2ray"
-    ]
-  },
-  {
-    name: "peasoft",
-    type: "raw",
-    urls: [
-      "https://raw.githubusercontent.com/peasoft/NoMoreWalls/master/list_raw.txt"
-    ]
-  },
-  {
-    name: "ermaozi",
-    type: "b64",
-    urls: [
-      "https://raw.githubusercontent.com/ermaozi/get_subscribe/main/subscribe/v2ray.txt"
-    ]
-  },
-  {
-    name: "aiboboxx",
-    type: "b64",
-    urls: [
-      "https://raw.githubusercontent.com/aiboboxx/v2rayfree/main/v2"
-    ]
-  },
-  {
-    name: "mahdibland",
-    type: "raw",
-    urls: [
-      "https://raw.githubusercontent.com/mahdibland/V2RayAggregator/master/sub/splitted/vmess.txt",
-      "https://raw.githubusercontent.com/mahdibland/V2RayAggregator/master/sub/splitted/trojan.txt"
-    ]
-  },
-  {
-    name: "bardiafa",
-    type: "raw",
-    urls: [
-      "https://raw.githubusercontent.com/Bardiafa/Free-V2ray-Config/main/All_Configs_Sub.txt"
-    ]
-  },
-  {
-    name: "autoproxy",
-    type: "b64",
-    urls: [
-      "https://raw.githubusercontent.com/w1770946466/Auto_proxy/main/Long_term_subscription1",
-      "https://raw.githubusercontent.com/w1770946466/Auto_proxy/main/Long_term_subscription2",
-      "https://raw.githubusercontent.com/w1770946466/Auto_proxy/main/Long_term_subscription3",
-      "https://raw.githubusercontent.com/w1770946466/Auto_proxy/main/Long_term_subscription4",
-      "https://raw.githubusercontent.com/w1770946466/Auto_proxy/main/Long_term_subscription5",
-      "https://raw.githubusercontent.com/w1770946466/Auto_proxy/main/Long_term_subscription6",
-      "https://raw.githubusercontent.com/w1770946466/Auto_proxy/main/Long_term_subscription7",
-      "https://raw.githubusercontent.com/w1770946466/Auto_proxy/main/Long_term_subscription8"
-    ]
-  },
-  {
-    name: "freefq",
-    type: "b64",
-    urls: [
-      "https://raw.githubusercontent.com/freefq/free/master/v2"
-    ]
-  },
-  {
-    name: "pawdroid",
-    type: "b64",
-    urls: [
-      "https://raw.githubusercontent.com/Pawdroid/Free-servers/main/sub"
-    ]
-  }
-];
+var MAX_CONFIGS = 200;
+var INCLUDE_ORIGINAL = false;
+var ONLY_ORIGINAL = false;
+var SELECTED_TYPES = ["vmess", "vless", "trojan"];
+var SELECTED_PROVIDERS = [];
 
 var __create = Object.create;
 var __defProp = Object.defineProperty;
@@ -1990,40 +1913,121 @@ var require_buffer = __commonJS({
 
 // src/index.ts
 var import_buffer = __toESM(require_buffer(), 1);
-
+var configProviders = [
+  {
+    name: "vpei",
+    type: "b64",
+    random: true,
+    urls: [
+      "https://raw.githubusercontent.com/vpei/Free-Node-Merge/main/o/node.txt"
+    ]
+  },
+  {
+    name: "mfuu",
+    type: "b64",
+    random: true,
+    urls: [
+      "https://raw.githubusercontent.com/mfuu/v2ray/master/v2ray"
+    ]
+  },
+  {
+    name: "peasoft",
+    type: "raw",
+    random: true,
+    urls: [
+      "https://raw.githubusercontent.com/peasoft/NoMoreWalls/master/list_raw.txt"
+    ]
+  },
+  {
+    name: "ermaozi",
+    type: "b64",
+    random: true,
+    urls: [
+      "https://raw.githubusercontent.com/ermaozi/get_subscribe/main/subscribe/v2ray.txt"
+    ]
+  },
+  {
+    name: "aiboboxx",
+    type: "b64",
+    random: true,
+    urls: [
+      "https://raw.githubusercontent.com/aiboboxx/v2rayfree/main/v2"
+    ]
+  },
+  {
+    name: "mahdibland",
+    type: "raw",
+    random: false,
+    urls: [
+      "https://raw.githubusercontent.com/mahdibland/V2RayAggregator/master/sub/splitted/vmess.txt",
+      "https://raw.githubusercontent.com/mahdibland/V2RayAggregator/master/sub/splitted/trojan.txt"
+    ]
+  },
+  {
+    name: "autoproxy",
+    type: "b64",
+    random: true,
+    urls: [
+      "https://raw.githubusercontent.com/w1770946466/Auto_proxy/main/Long_term_subscription1",
+      "https://raw.githubusercontent.com/w1770946466/Auto_proxy/main/Long_term_subscription2",
+      "https://raw.githubusercontent.com/w1770946466/Auto_proxy/main/Long_term_subscription3",
+      "https://raw.githubusercontent.com/w1770946466/Auto_proxy/main/Long_term_subscription4",
+      "https://raw.githubusercontent.com/w1770946466/Auto_proxy/main/Long_term_subscription5",
+      "https://raw.githubusercontent.com/w1770946466/Auto_proxy/main/Long_term_subscription6",
+      "https://raw.githubusercontent.com/w1770946466/Auto_proxy/main/Long_term_subscription7",
+      "https://raw.githubusercontent.com/w1770946466/Auto_proxy/main/Long_term_subscription8"
+    ]
+  },
+  {
+    name: "freefq",
+    type: "b64",
+    random: true,
+    urls: [
+      "https://raw.githubusercontent.com/freefq/free/master/v2"
+    ]
+  },
+  {
+    name: "pawdroid",
+    type: "b64",
+    random: true,
+    urls: [
+      "https://raw.githubusercontent.com/Pawdroid/Free-servers/main/sub"
+    ]
+  }
+];
 var ipProviderLink = "https://raw.githubusercontent.com/vfarid/cf-clean-ips/main/list.json";
-var addressList = [
-  "discord.com",
-  "cloudflare.com",
-  "nginx.com",
-  "www.speedtest.com",
-  "laravel.com",
-  "chat.openai.com",
-  "auth0.openai.com",
-  "codepen.io",
-  "api.jquery.com"
-];
-var fpList = [
-  "chrome",
-  "chrome",
-  "chrome",
-  "firefox",
-  "safari",
-  "edge",
-  "ios",
-  "android",
-  "random",
-  "random"
-];
-var alpnList = [
-  "http/1.1",
-  "h2,http/1.1",
-  "h2,http/1.1"
-];
+var selectedTypes = SELECTED_TYPES;
+var selectedProviders = SELECTED_PROVIDERS;
 var operators = [];
 var cleanIPs = [];
 var maxConfigs = MAX_CONFIGS;
 var includeOriginalConfigs = INCLUDE_ORIGINAL;
+var onlyOriginalConfigs = ONLY_ORIGINAL;
+var alpnList = [
+  "h2,http/1.1",
+  "h2,http/1.1",
+  "h2,http/1.1",
+  "http/1.1"
+];
+var fpList = [
+  "chrome_auto",
+  "edge_auto",
+  "ios_auto",
+  "firefox_auto",
+  "android_11_okhttp",
+  "safari_auto",
+  "ios_13",
+  "ios_14",
+  "360_auto"
+];
+var domainList = [
+  "discord.com",
+  "laravel.com",
+  "cdnjs.com",
+  "www.speedtest.net",
+  "speed.cloudflare.com",
+  "workers.dev"
+];
 var src_default = {
   async fetch(request) {
     const url = new URL(request.url);
@@ -2032,7 +2036,7 @@ var src_default = {
     const type = parts[0].toLowerCase();
     if (type === "sub") {
       if (parts[1] !== void 0) {
-        if (parts[1].includes(".")) {
+        if (parts[1].includes(".") || parts[1].includes(":")) {
           cleanIPs = parts[1].toLowerCase().trim().split(",").map((ip2) => {
             return { ip: ip2, operator: "IP" };
           });
@@ -2056,31 +2060,60 @@ var src_default = {
         const original = url.searchParams.get("original");
         includeOriginalConfigs = ["1", "true", "yes", "y"].includes(original.toLowerCase());
       }
-      if (includeOriginalConfigs) {
+      if (includeOriginalConfigs && url.searchParams.has("merge")) {
+        const merge = url.searchParams.get("merge");
+        onlyOriginalConfigs = !["1", "true", "yes", "y"].includes(merge.toLowerCase());
+      }
+      if (url.searchParams.has("fp")) {
+        fpList = [url.searchParams.get("fp").toLocaleLowerCase().trim()];
+      }
+      if (url.searchParams.has("alpn")) {
+        alpnList = [url.searchParams.get("alpn").toLocaleLowerCase().trim()];
+      }
+      if (url.searchParams.has("type")) {
+        selectedTypes = url.searchParams.get("type").toLocaleLowerCase().split(",").map((s) => s.trim());
+      }
+      if (url.searchParams.has("provider")) {
+        selectedProviders = url.searchParams.get("provider").toLocaleLowerCase().split(",").map((s) => s.trim());
+      }
+      if (includeOriginalConfigs && !onlyOriginalConfigs) {
         maxConfigs = Math.floor(maxConfigs / 2);
       }
       var configList = [];
       var acceptableConfigList = [];
       var finalConfigList = [];
       var newConfigs;
+      const configPerList = Math.floor(maxConfigs / configProviders.length);
       for (const sub of configProviders) {
         try {
+          if (selectedProviders.length > 0 && !selectedProviders.includes(sub.name)) {
+            continue;
+          }
           newConfigs = [];
           for (const link of sub.urls) {
-            newConfigs.push(await fetch(link).then((r) => r.text()));
+            var content = await fetch(link).then((r) => r.text());
             if (sub.type === "b64") {
-              newConfigs = import_buffer.Buffer.from(newConfigs, "base64").toString("utf-8");
+              content = import_buffer.Buffer.from(content, "base64").toString("utf-8");
             }
+            newConfigs.push(content);
           }
           newConfigs = newConfigs.join("\n").split("\n");
-          acceptableConfigList.push({
-            name: sub.name,
-            configs: newConfigs.filter((cnf) => cnf.match(/^(vmess|vless|trojan):\/\//i))
-          });
+          if (!onlyOriginalConfigs) {
+            acceptableConfigList.push({
+              name: sub.name,
+              random: sub.random,
+              count: configPerList,
+              configs: newConfigs.filter((cnf) => cnf.match(/^(vmess|vless|trojan):\/\//i)),
+              mergedConfigs: null
+            });
+          }
           if (includeOriginalConfigs) {
             configList.push({
               name: sub.name,
-              configs: newConfigs.filter((cnf) => cnf.match(/^(vmess|vless|trojan|ss|ssr):\/\//i))
+              random: sub.random,
+              count: configPerList,
+              configs: newConfigs.filter((cnf) => cnf.match(new RegExp(`(${selectedTypes.join("|")})`, "i"))),
+              renamesConfigs: null
             });
           }
         } catch (e) {
@@ -2091,38 +2124,70 @@ var src_default = {
         operators = ["General"];
         cleanIPs = [{ ip: "", operator: "General" }];
       }
-      const configPerList = Math.ceil(maxConfigs / acceptableConfigList.length);
       for (const operator of operators) {
         var ipList = cleanIPs.filter((el) => el.operator == operator).slice(0, 5);
         var ip = ipList[Math.floor(Math.random() * ipList.length)].ip;
+        for (const i2 in acceptableConfigList) {
+          const el = acceptableConfigList[i2];
+          acceptableConfigList[i2].mergedConfigs = el.configs.map(decodeConfig).map((cnf) => mixConfig(cnf, url, ip, operator, el.name)).filter((cnf) => !!cnf && cnf.id).map(encodeConfig).filter((cnf) => !!cnf);
+        }
+        var remaining = 0;
+        for (var i = 0; i < 5; i++) {
+          for (const el of acceptableConfigList) {
+            if (el.count > el.mergedConfigs.length) {
+              remaining = remaining + el.count - el.mergedConfigs.length;
+              el.count = el.mergedConfigs.length;
+            } else if (el.count < el.mergedConfigs.length && remaining > 0) {
+              el.count = el.count + Math.ceil(remaining / 3);
+              remaining = remaining - Math.ceil(remaining / 3);
+            }
+          }
+        }
         for (const el of acceptableConfigList) {
           finalConfigList = finalConfigList.concat(
-            getMultipleRandomElements(
-              el.configs.map(decodeConfig).map((cnf) => mixConfig(cnf, url, ip, operator, el.name)).filter((cnf) => !!cnf && cnf.id).map(encodeConfig).filter((cnf) => !!cnf),
-              configPerList
-            )
+            el.random ? getMultipleRandomElements(el.mergedConfigs, el.count) : el.mergedConfigs.slice(0, el.count)
           );
         }
       }
       if (includeOriginalConfigs) {
+        for (const i2 in configList) {
+          const el = configList[i2];
+          configList[i2].renamedConfigs = el.configs.map(decodeConfig).map((cnf) => renameConfig(cnf, el.name)).filter((cnf) => !!cnf && cnf.id).map(encodeConfig).filter((cnf) => !!cnf);
+        }
+        var remaining = 0;
+        for (var i = 0; i < 5; i++) {
+          for (const el of configList) {
+            if (el.count > el.renamedConfigs.length) {
+              remaining = remaining + el.count - el.renamedConfigs.length;
+              el.count = el.renamedConfigs.length;
+            } else if (el.count < el.renamedConfigs.length && remaining > 0) {
+              el.count = el.count + Math.ceil(remaining / 3);
+              remaining = remaining - Math.ceil(remaining / 3);
+            }
+          }
+        }
         for (const el of configList) {
           finalConfigList = finalConfigList.concat(
-            getMultipleRandomElements(
-              el.configs.map(decodeConfig).map((cnf) => renameConfig(cnf, el.name)).filter((cnf) => !!cnf && cnf.id).map(encodeConfig).filter((cnf) => !!cnf),
-              configPerList
-            )
+            el.random ? getMultipleRandomElements(el.renamedConfigs, el.count) : el.renamedConfigs.slice(0, el.count)
           );
         }
       }
       return new Response(import_buffer.Buffer.from(finalConfigList.join("\n"), "utf-8").toString("base64"));
     } else if (path) {
-      var newUrl = new URL("https://" + url.pathname.replace(/^\/|\/$/g, ""));
+      const addrPath = url.pathname.replace(/^\/|\/$/g, "");
+      const newUrl = new URL("https://" + addrPath);
       return fetch(new Request(newUrl, request));
     } else {
       return new Response(`<!DOCTYPE html>
 <body dir="rtl">
   <h3><font color="green">\u0647\u0645\u0647 \u0686\u06CC \u062F\u0631\u0633\u062A\u0647</font></h3>
   <p />
+  <p>
+    \u0627\u06CC\u0646 \u0644\u06CC\u0646\u06A9 sub \u0631\u0627 \u062F\u0631 \u0627\u067E v2ray \u062E\u0648\u062F \u0628\u0647 \u0634\u06A9\u0644 \u0632\u06CC\u0631 \u06A9\u067E\u06CC \u06A9\u0646\u06CC\u062F. \u062F\u0631 \u0627\u06CC\u0646 \u0635\u0648\u0631\u062A \u06CC\u06A9 \u062F\u0627\u0645\u06CC\u0646 \u0627\u062A\u0641\u0627\u0642\u06CC \u0627\u0632 \u062E\u0648\u062F \u0648\u0631\u06A9\u0631 \u0628\u0647 \u0639\u0646\u0648\u0627\u0646 \u0622\u06CC\u200C\u067E\u06CC \u062A\u0645\u06CC\u0632 \u0627\u0646\u062A\u062E\u0627\u0628 \u0634\u062F\u0647 \u0648 \u0631\u0648\u06CC \u0628\u06CC\u0634\u062A\u0631 \u0627\u0648\u067E\u0631\u0627\u062A\u0648\u0631\u0647\u0627 \u0628\u0627 \u06A9\u06CC\u0641\u06CC\u062A \u062E\u0648\u0628 \u067E\u0627\u0633\u062E \u062E\u0648\u0627\u0647\u062F \u062F\u0627\u062F:
+  </p>
+  <p>
+    <a href="https://${url.hostname}/sub">https://${url.hostname}/sub</a>
+  </p>
   <p>
     \u0627\u06CC\u0646 \u0644\u06CC\u0646\u06A9 sub \u0631\u0627 \u0647\u0645\u0631\u0627\u0647 \u0628\u0627 \u06A9\u062F \u0627\u067E\u0631\u0627\u062A\u0648\u0631 \u062F\u0631 \u0627\u067E v2ray \u062E\u0648\u062F \u06A9\u067E\u06CC \u06A9\u0646\u06CC\u062F. \u0628\u0631\u0627\u06CC \u0645\u062B\u0627\u0644 \u062F\u0631 \u0647\u0645\u0631\u0627\u0647 \u0627\u0648\u0644 \u0628\u0647 \u0634\u06A9\u0644 \u0632\u06CC\u0631 \u062E\u0648\u0627\u0647\u062F \u0628\u0648\u062F:
   </p>
@@ -2157,7 +2222,7 @@ var src_default = {
     \u0645\u06CC\u200C\u062A\u0648\u0627\u0646\u06CC\u062F \u0628\u0627 \u0645\u062A\u063A\u06CC\u0631 max \u062A\u0639\u062F\u0627\u062F \u06A9\u0627\u0646\u0641\u06CC\u06AF \u0631\u0627 \u0645\u0634\u062E\u0635 \u06A9\u0646\u06CC\u062F:
   </p>
   <p>
-    <a href="https://${url.hostname}/sub/1.2.3.4?max=200">https://${url.hostname}/sub/1.2.3.4?max=200</a>
+    <a href="https://${url.hostname}/sub?max=200">https://${url.hostname}/sub?max=200</a>
   </p>
   <p>
     \u0647\u0645\u0686\u0646\u06CC\u0646 \u0645\u06CC\u200C\u062A\u0648\u0627\u0646\u06CC\u062F \u0628\u0627 \u0645\u062A\u063A\u06CC\u0631 original \u0628\u0627 \u0639\u062F\u062F 0 \u06CC\u0627 1 \u0648 \u06CC\u0627 \u0628\u0627 yes/no \u0645\u0634\u062E\u0635 \u06A9\u0646\u06CC\u062F \u06A9\u0647 \u06A9\u0627\u0646\u0641\u06CC\u06AF\u200C\u0647\u0627\u06CC \u0627\u0635\u0644\u06CC (\u062A\u0631\u06A9\u06CC\u0628 \u0646\u0634\u062F\u0647 \u0628\u0627 \u0648\u0631\u06A9\u0631) \u0647\u0645 \u062F\u0631 \u062E\u0631\u0648\u062C\u06CC \u0622\u0648\u0631\u062F\u0647 \u0634\u0648\u0646\u062F \u06CC\u0627 \u0646\u0647:
@@ -2166,7 +2231,31 @@ var src_default = {
     <a href="https://${url.hostname}/sub/1.2.3.4?max=200&original=yes">https://${url.hostname}/sub/1.2.3.4?max=200&original=yes</a>
   </p>
   <p>
-    <a href="https://${url.hostname}/sub/1.2.3.4?max=200&original=0">https://${url.hostname}/sub/1.2.3.4?max=200&original=0</a>
+    <a href="https://${url.hostname}/sub?max=200&original=0">https://${url.hostname}/sub?max=200&original=0</a>
+  </p>
+  <p>
+    \u062F\u0631 \u0635\u0648\u0631\u062A \u0644\u0632\u0648\u0645 \u0645\u06CC \u062A\u0648\u0627\u0646\u06CC\u062F \u0628\u0627 \u0645\u062A\u063A\u06CC\u0631 merge \u0645\u0634\u062E\u0635 \u06A9\u0646\u06CC\u062F \u06A9\u0647 \u06A9\u0627\u0646\u0641\u06CC\u06AF\u200C\u0647\u0627\u06CC \u062A\u0631\u06A9\u06CC\u0628\u06CC \u062D\u0630\u0641 \u0634\u0648\u0646\u062F:
+  </p>
+  <p>
+    <a href="https://${url.hostname}/sub?max=200&original=yes&merge=no">https://${url.hostname}/sub?max=200&original=yes&merge=no</a>
+  </p>
+  <p>
+    \u0647\u0645\u0686\u0646\u06CC\u0646 \u0645\u06CC\u200C\u062A\u0648\u0627\u0646\u06CC\u062F fp \u0648 alpn \u0631\u0627 \u0646\u06CC\u0632 \u0645\u0634\u062E\u0635 \u06A9\u0646\u06CC\u062F:
+  </p>
+  <p>
+    <a href="https://${url.hostname}/sub?max=200&fp=chrome&alpn=h2,http/1.1">https://${url.hostname}/sub?max=200&fp=chrome&alpn=h2,http/1.1</a>
+  </p>
+  <p>
+    \u062F\u0631 \u0635\u0648\u0631\u062A \u0646\u06CC\u0627\u0632 \u0645\u06CC\u200C\u062A\u0648\u0627\u0646\u06CC\u062F \u0628\u0631\u0627\u06CC \u06A9\u0627\u0646\u0641\u06CC\u06AF\u200C\u0647\u0627\u06CC \u0627\u0635\u0644\u06CC\u060C \u062A\u0639\u06CC\u06CC\u0646 \u06A9\u0646\u06CC\u062F \u06A9\u0647 \u06A9\u062F\u0627\u0645 \u0646\u0648\u0639 \u0627\u0632 \u06A9\u0627\u0646\u0641\u06CC\u06AF\u200C\u0647\u0627 \u0631\u0627 \u0628\u0631\u0627\u06CC \u0634\u0645\u0627 \u0644\u06CC\u0633\u062A \u06A9\u0646\u062F:
+  </p>
+  <p>
+    <a href="https://${url.hostname}/sub?max=200&type=vmess,ss,ssr,vless">https://${url.hostname}/sub?max=200&type=vmess,ss,ssr,vless</a>
+  </p>
+  <p>
+    \u062F\u0631 \u0635\u0648\u0631\u062A \u0646\u06CC\u0627\u0632 \u0645\u06CC\u200C\u062A\u0648\u0627\u0646\u06CC\u062F \u0644\u06CC\u0633\u062A \u067E\u0631\u0648\u0648\u0627\u06CC\u062F\u0631\u0647\u0627 \u0631\u0627 \u0645\u062D\u062F\u0648\u062F \u06A9\u0646\u06CC\u062F:
+  </p>
+  <p>
+    <a href="https://${url.hostname}/sub?provider=mahdibland,vpei">https://${url.hostname}/sub?provider=mahdibland,vpei</a>
   </p>
 </body>`, {
         headers: {
@@ -2183,7 +2272,7 @@ function encodeConfig(conf) {
       delete conf.protocol;
       configStr = "vmess://" + import_buffer.Buffer.from(JSON.stringify(conf), "utf-8").toString("base64");
     } else if (["vless", "trojan"].includes(conf?.protocol)) {
-      configStr = `${conf.protocol}://${conf.id}@${conf.add}:${conf.port}?security=${conf.tls}&type=${conf.type}&path=${encodeURIComponent(conf.path)}&host=${encodeURIComponent(conf.host)}&tls=${conf.tls}&sni=${conf.sni}#${encodeURIComponent(conf.ps)}`;
+      configStr = `${conf.protocol}://${conf.id}@${conf.add}:${conf.port}?security=${conf.tls}&type=${conf.net}&path=${encodeURIComponent(conf.path)}&host=${encodeURIComponent(conf.host)}&tls=${conf.tls}&sni=${conf.sni}#${encodeURIComponent(conf.ps)}`;
     }
   } catch (e) {
   }
@@ -2212,7 +2301,7 @@ function decodeConfig(configStr) {
         add: match.groups?.add,
         port: match.groups.port ?? 443,
         ps: match.groups?.ps,
-        type: optionsObj.type ?? "tcp",
+        net: optionsObj.type ?? (optionsObj.net ?? "tcp"),
         host: optionsObj?.host,
         path: optionsObj?.path,
         tls: optionsObj.security ?? "none",
@@ -2226,7 +2315,7 @@ function decodeConfig(configStr) {
 }
 function mixConfig(conf, url, ip, operator, provider) {
   try {
-    if (conf.tls != "tls") {
+    if (conf.tls != "tls" || conf.net == "tcp") {
       return {};
     }
     var addr = conf.sni;
@@ -2246,12 +2335,12 @@ function mixConfig(conf, url, ip, operator, provider) {
       var path;
       if (part1.includes(":")) {
         addr = part1.replace(/^\//g, "").split(":");
-        conf.port = addr[1];
+        conf.port = parseInt(addr[1]);
         addr = addr[0];
         path = "/" + part2.replace(/^\//g, "");
       } else if (part2.includes(":")) {
         addr = part2.replace(/^\//g, "").split(":");
-        conf.port = addr[1];
+        conf.port = parseInt(addr[1]);
         addr = addr[0];
         path = "/" + part1.replace(/^\//g, "");
       } else if (part1.includes(".")) {
@@ -2276,15 +2365,15 @@ function mixConfig(conf, url, ip, operator, provider) {
     if (ip) {
       conf.add = ip;
     } else {
-      conf.add = addressList[Math.floor(Math.random() * addressList.length)];
+      conf.add = domainList[Math.floor(Math.random() * domainList.length)];
     }
-    if (!conf?.host) {
-      conf.host = addr;
+    if (conf?.port != 443) {
+      return {};
     }
-    conf.path = "/" + addr + ":" + conf.port + (conf?.path ? "/" + conf.path.replace(/^\//g, "") : "");
-    conf.fp = fpList[Math.floor(Math.random() * fpList.length)];
+    conf.path = "/" + addr + (conf?.path ? "/" + conf.path.replace(/^\//g, "") : "");
     conf.alpn = alpnList[Math.floor(Math.random() * alpnList.length)];
-    conf.port = 443;
+    conf.fp = fpList[Math.floor(Math.random() * fpList.length)];
+    conf.utls = conf.fp;
     return conf;
   } catch (e) {
     return {};
@@ -2300,7 +2389,7 @@ function renameConfig(conf, provider) {
   }
 }
 function getMultipleRandomElements(arr, num) {
-  var shuffled = [...arr].sort(() => 0.5 - Math.random());
+  var shuffled = arr.slice(0, num * 2).sort(() => 0.5 - Math.random());
   return shuffled.slice(0, num);
 }
 function isIp(str) {
