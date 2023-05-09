@@ -4,13 +4,17 @@
   * Licensed under GPLv3 (https://github.com/vfarid/v2ray-worker-sub/blob/main/Licence.md)
   */
 
-const MAX_CONFIGS = 1000
-const INCLUDE_ORIGINAL = true
+const MAX_CONFIGS: number = 200
+const INCLUDE_ORIGINAL: boolean = false
+const ONLY_ORIGINAL: boolean = false
+const SELECTED_TYPES: Array<string> = ["vmess", "vless", "trojan"]
+const SELECTED_PROVIDERS: Array<string> = []
 
 const configProviders: Array<any> = [
   {
     name: "vpei",
     type: "b64",
+    random: true,
     urls: [
       "https://raw.githubusercontent.com/vpei/Free-Node-Merge/main/o/node.txt",
     ],
@@ -18,6 +22,7 @@ const configProviders: Array<any> = [
   {
     name: "mfuu",
     type: "b64",
+    random: true,
     urls: [
       "https://raw.githubusercontent.com/mfuu/v2ray/master/v2ray",
     ],
@@ -25,6 +30,7 @@ const configProviders: Array<any> = [
   {
     name: "peasoft",
     type: "raw",
+    random: true,
     urls: [
       "https://raw.githubusercontent.com/peasoft/NoMoreWalls/master/list_raw.txt",
     ],
@@ -32,6 +38,7 @@ const configProviders: Array<any> = [
   {
     name: "ermaozi",
     type: "b64",
+    random: true,
     urls: [
       "https://raw.githubusercontent.com/ermaozi/get_subscribe/main/subscribe/v2ray.txt",
     ],
@@ -39,6 +46,7 @@ const configProviders: Array<any> = [
   {
     name: "aiboboxx",
     type: "b64",
+    random: true,
     urls: [
       "https://raw.githubusercontent.com/aiboboxx/v2rayfree/main/v2",
     ],
@@ -46,21 +54,16 @@ const configProviders: Array<any> = [
   {
     name: "mahdibland",
     type: "raw",
+    random: false,
     urls: [
       "https://raw.githubusercontent.com/mahdibland/V2RayAggregator/master/sub/splitted/vmess.txt",
       "https://raw.githubusercontent.com/mahdibland/V2RayAggregator/master/sub/splitted/trojan.txt",
     ],
   },
   {
-    name: "bardiafa",
-    type: "raw",
-    urls: [
-      "https://raw.githubusercontent.com/Bardiafa/Free-V2ray-Config/main/All_Configs_Sub.txt",
-    ],
-  },
-  {
     name: "autoproxy",
     type: "b64",
+    random: true,
     urls: [
       "https://raw.githubusercontent.com/w1770946466/Auto_proxy/main/Long_term_subscription1",
       "https://raw.githubusercontent.com/w1770946466/Auto_proxy/main/Long_term_subscription2",
@@ -75,6 +78,7 @@ const configProviders: Array<any> = [
   {
     name: "freefq",
     type: "b64",
+    random: true,
     urls: [
       "https://raw.githubusercontent.com/freefq/free/master/v2",
     ],
@@ -82,50 +86,56 @@ const configProviders: Array<any> = [
   {
     name: "pawdroid",
     type: "b64",
+    random: true,
     urls: [
       "https://raw.githubusercontent.com/Pawdroid/Free-servers/main/sub",
     ],
   },
+  // {
+  //   name: "rescuenet",
+  //   type: "raw",
+  //   random: true,
+  //   urls: [
+  //     "https://raw.githubusercontent.com/RescueNet/TelegramFreeServer/main/Raw/All_Sub",
+  //   ],
+  // },
 ]
 
 const ipProviderLink = "https://raw.githubusercontent.com/vfarid/cf-clean-ips/main/list.json"
 
-const addressList = [
-  "discord.com",
-  "cloudflare.com",
-  "nginx.com",
-  "www.speedtest.com",
-  "laravel.com",
-  "chat.openai.com",
-  "auth0.openai.com",
-  "codepen.io",
-  "api.jquery.com"
-]
-
-const fpList = [
-  "chrome",
-  "chrome",
-  "chrome",
-  "firefox",
-  "safari",
-  "edge",
-  "ios",
-  "android",
-  "random",
-  "random"
-]
-
-const alpnList = [
-  "http/1.1",
-  "h2,http/1.1",
-  "h2,http/1.1"
-]
-
+var selectedTypes: Array<string> = SELECTED_TYPES
+var selectedProviders: Array<string> = SELECTED_PROVIDERS
 var operators: Array<string> = []
 var cleanIPs: Array<any> = []
-var cleanIP: string = ""
 var maxConfigs: number = MAX_CONFIGS
 var includeOriginalConfigs: boolean = INCLUDE_ORIGINAL
+var onlyOriginalConfigs: boolean = ONLY_ORIGINAL
+var alpnList: Array<string> = [
+  "h2,http/1.1",
+  "h2,http/1.1",
+  "h2,http/1.1",
+  "http/1.1",
+]
+var fpList: Array<string> = [
+  "chrome_auto",
+  "edge_auto",
+  "ios_auto",
+  "firefox_auto",
+  "android_11_okhttp",
+  "safari_auto",
+  "ios_13",
+  "ios_14",
+  "360_auto",
+]
+var domainList: Array<string> = [
+  "discord.com",
+  "laravel.com",
+  "cdnjs.com",
+  "www.speedtest.net",
+  "speed.cloudflare.com",
+  "workers.dev",
+]
+
 
 import { Buffer } from 'buffer'
 
@@ -137,7 +147,7 @@ export default {
     const type = parts[0].toLowerCase()
     if (type === "sub") {
       if (parts[1] !== undefined) {
-        if (parts[1].includes(".")) { // Subdomain or IP
+        if (parts[1].includes(".") || parts[1].includes(":")) { // Subdomain or IP
           cleanIPs = parts[1].toLowerCase().trim().split(",").map((ip: string) => {return {ip: ip, operator: "IP"}})
           operators = ["IP"]
         } else { // Operator code
@@ -151,19 +161,40 @@ export default {
         }
       }
 
-      if (url.searchParams.has('max')) {
-        maxConfigs = parseInt(url.searchParams.get('max') as string)
+      if (url.searchParams.has("max")) {
+        maxConfigs = parseInt(url.searchParams.get("max") as string)
         if (!maxConfigs) {
           maxConfigs = MAX_CONFIGS
         }
       }
 
-      if (url.searchParams.has('original')) {
-        const original = url.searchParams.get('original') as string
+      if (url.searchParams.has("original")) {
+        const original = url.searchParams.get("original") as string
         includeOriginalConfigs = ["1", "true", "yes", "y"].includes(original.toLowerCase())
       }
 
-      if (includeOriginalConfigs) {
+      if (includeOriginalConfigs && url.searchParams.has("merge")) {
+        const merge = url.searchParams.get("merge") as string
+        onlyOriginalConfigs = !["1", "true", "yes", "y"].includes(merge.toLowerCase())
+      }
+
+      if (url.searchParams.has("fp")) {
+        fpList = [(url.searchParams.get("fp") as string).toLocaleLowerCase().trim()]
+      }
+
+      if (url.searchParams.has("alpn")) {
+        alpnList = [(url.searchParams.get("alpn") as string).toLocaleLowerCase().trim()]
+      }
+
+      if (url.searchParams.has("type")) {
+        selectedTypes = (url.searchParams.get("type") as string).toLocaleLowerCase().split(",").map((s: string) => s.trim())
+      }
+
+      if (url.searchParams.has("provider")) {
+        selectedProviders = (url.searchParams.get("provider") as string).toLocaleLowerCase().split(",").map((s: string) => s.trim())
+      }
+
+      if (includeOriginalConfigs && !onlyOriginalConfigs) {
         maxConfigs = Math.floor(maxConfigs / 2)
       }
 
@@ -171,25 +202,38 @@ export default {
       var acceptableConfigList: Array<any> = []
       var finalConfigList: Array<any> = []
       var newConfigs: any
+      const configPerList = Math.floor(maxConfigs / configProviders.length)
 
       for (const sub of configProviders) {
         try {
+          if (selectedProviders.length > 0 && !selectedProviders.includes(sub.name)) {
+            continue
+          }
           newConfigs = []
           for (const link of sub.urls) {
-            newConfigs.push(await fetch(link).then(r => r.text()))
+            var content: string = await fetch(link).then(r => r.text())
             if (sub.type === "b64") {
-              newConfigs = Buffer.from(newConfigs, "base64").toString("utf-8")
+              content = Buffer.from(content, "base64").toString("utf-8")
             }
+            newConfigs.push(content)
           }
           newConfigs = newConfigs.join("\n").split("\n")
-          acceptableConfigList.push({
-            name: sub.name,
-            configs: newConfigs.filter((cnf: any) => cnf.match(/^(vmess|vless|trojan):\/\//i))
-          })
+          if (!onlyOriginalConfigs) {
+            acceptableConfigList.push({
+              name: sub.name,
+              random: sub.random,
+              count: configPerList,
+              configs: newConfigs.filter((cnf: any) => cnf.match(/^(vmess|vless|trojan):\/\//i)),
+              mergedConfigs: null,
+            })
+          }
           if (includeOriginalConfigs) {
             configList.push({
               name: sub.name,
-              configs: newConfigs.filter((cnf: any) => cnf.match(/^(vmess|vless|trojan|ss|ssr):\/\//i))
+              random: sub.random,
+              count: configPerList,
+              configs: newConfigs.filter((cnf: any) => cnf.match(new RegExp(`(${selectedTypes.join("|")})`, "i"))),
+              renamesConfigs: null,
             })
           }
         } catch (e) { }
@@ -201,43 +245,69 @@ export default {
         cleanIPs = [{ip: "", operator: "General"}]
       }
 
-      const configPerList = Math.ceil(maxConfigs / acceptableConfigList.length)
       for (const operator of operators) {
         var ipList = cleanIPs.filter(el => el.operator == operator).slice(0, 5)
         var ip = ipList[Math.floor(Math.random() * ipList.length)].ip
+        for (const i in acceptableConfigList) {
+          const el = acceptableConfigList[i]
+          acceptableConfigList[i].mergedConfigs = el.configs
+            .map(decodeConfig)
+            .map((cnf: any) => mixConfig(cnf, url, ip, operator, el.name))
+            .filter((cnf: any) => (!!cnf && cnf.id))
+            .map(encodeConfig)
+            .filter((cnf: any) => !!cnf)
+        }
+        var remaining = 0
+        for (var i = 0; i < 5; i++) {
+          for (const el of acceptableConfigList) {
+            if (el.count > el.mergedConfigs.length) {
+              remaining = remaining + el.count - el.mergedConfigs.length
+              el.count = el.mergedConfigs.length
+            } else if (el.count < el.mergedConfigs.length && remaining > 0) {
+              el.count = el.count + Math.ceil(remaining / 3)
+              remaining = remaining - Math.ceil(remaining / 3)
+            }
+          }
+        }
         for (const el of acceptableConfigList) {
           finalConfigList = finalConfigList.concat(
-            getMultipleRandomElements(
-              el.configs
-                .map(decodeConfig)
-                .map((cnf: any) => mixConfig(cnf, url, ip, operator, el.name))
-                .filter((cnf: any) => (!!cnf && cnf.id))
-                .map(encodeConfig)
-                .filter((cnf: any) => !!cnf),
-              configPerList
-            )
+            el.random ? getMultipleRandomElements(el.mergedConfigs, el.count) : el.mergedConfigs.slice(0, el.count)
           )
         }
       }
       if (includeOriginalConfigs) {
+        for (const i in configList) {
+          const el = configList[i]
+          configList[i].renamedConfigs = el.configs
+            .map(decodeConfig)
+            .map((cnf: any) => renameConfig(cnf, el.name))
+            .filter((cnf: any) => (!!cnf && cnf.id))
+            .map(encodeConfig)
+            .filter((cnf: any) => !!cnf)
+        }
+        var remaining = 0
+        for (var i = 0; i < 5; i++) {
+          for (const el of configList) {
+            if (el.count > el.renamedConfigs.length) {
+              remaining = remaining + el.count - el.renamedConfigs.length
+              el.count = el.renamedConfigs.length
+            } else if (el.count < el.renamedConfigs.length && remaining > 0) {
+              el.count = el.count + Math.ceil(remaining / 3)
+              remaining = remaining - Math.ceil(remaining / 3)
+            }
+          }
+        }
         for (const el of configList) {
           finalConfigList = finalConfigList.concat(
-            getMultipleRandomElements(
-              el.configs
-                .map(decodeConfig)
-                .map((cnf: any) => renameConfig(cnf, el.name))
-                .filter((cnf: any) => (!!cnf && cnf.id))
-                .map(encodeConfig)
-                .filter((cnf: any) => !!cnf),
-                configPerList
-            )
+            el.random ? getMultipleRandomElements(el.renamedConfigs, el.count) : el.renamedConfigs.slice(0, el.count)
           )
         }
       }
       // return new Response(finalConfigList.join("\n"))
       return new Response(Buffer.from(finalConfigList.join("\n"), "utf-8").toString("base64"))
     } else if (path) {
-      var newUrl = new URL("https://" + url.pathname.replace(/^\/|\/$/g, ""))
+      const addrPath = url.pathname.replace(/^\/|\/$/g, "")
+      const newUrl = new URL("https://" + addrPath)
       return fetch(new Request(newUrl, request))
     } else {
       return new Response(`\
@@ -245,6 +315,12 @@ export default {
 <body dir="rtl">
   <h3><font color="green">همه چی درسته</font></h3>
   <p />
+  <p>
+    این لینک sub را در اپ v2ray خود به شکل زیر کپی کنید. در این صورت یک دامین اتفاقی از خود ورکر به عنوان آی‌پی تمیز انتخاب شده و روی بیشتر اوپراتورها با کیفیت خوب پاسخ خواهد داد:
+  </p>
+  <p>
+    <a href="https://${url.hostname}/sub">https://${url.hostname}/sub</a>
+  </p>
   <p>
     این لینک sub را همراه با کد اپراتور در اپ v2ray خود کپی کنید. برای مثال در همراه اول به شکل زیر خواهد بود:
   </p>
@@ -279,7 +355,7 @@ export default {
     می‌توانید با متغیر max تعداد کانفیگ را مشخص کنید:
   </p>
   <p>
-    <a href="https://${url.hostname}/sub/1.2.3.4?max=200">https://${url.hostname}/sub/1.2.3.4?max=200</a>
+    <a href="https://${url.hostname}/sub?max=200">https://${url.hostname}/sub?max=200</a>
   </p>
   <p>
     همچنین می‌توانید با متغیر original با عدد 0 یا 1 و یا با yes/no مشخص کنید که کانفیگ‌های اصلی (ترکیب نشده با ورکر) هم در خروجی آورده شوند یا نه:
@@ -288,7 +364,31 @@ export default {
     <a href="https://${url.hostname}/sub/1.2.3.4?max=200&original=yes">https://${url.hostname}/sub/1.2.3.4?max=200&original=yes</a>
   </p>
   <p>
-    <a href="https://${url.hostname}/sub/1.2.3.4?max=200&original=0">https://${url.hostname}/sub/1.2.3.4?max=200&original=0</a>
+    <a href="https://${url.hostname}/sub?max=200&original=0">https://${url.hostname}/sub?max=200&original=0</a>
+  </p>
+  <p>
+    در صورت لزوم می توانید با متغیر merge مشخص کنید که کانفیگ‌های ترکیبی حذف شوند:
+  </p>
+  <p>
+    <a href="https://${url.hostname}/sub?max=200&original=yes&merge=no">https://${url.hostname}/sub?max=200&original=yes&merge=no</a>
+  </p>
+  <p>
+    همچنین می‌توانید fp و alpn را نیز مشخص کنید:
+  </p>
+  <p>
+    <a href="https://${url.hostname}/sub?max=200&fp=chrome&alpn=h2,http/1.1">https://${url.hostname}/sub?max=200&fp=chrome&alpn=h2,http/1.1</a>
+  </p>
+  <p>
+    در صورت نیاز می‌توانید برای کانفیگ‌های اصلی، تعیین کنید که کدام نوع از کانفیگ‌ها را برای شما لیست کند:
+  </p>
+  <p>
+    <a href="https://${url.hostname}/sub?max=200&type=vmess,ss,ssr,vless">https://${url.hostname}/sub?max=200&type=vmess,ss,ssr,vless</a>
+  </p>
+  <p>
+    در صورت نیاز می‌توانید لیست پرووایدرها را محدود کنید:
+  </p>
+  <p>
+    <a href="https://${url.hostname}/sub?provider=mahdibland,vpei">https://${url.hostname}/sub?provider=mahdibland,vpei</a>
   </p>
 </body>`, {
         headers: {
@@ -307,7 +407,7 @@ function encodeConfig(conf: any): string|null {
       delete conf.protocol
       configStr = "vmess://" + Buffer.from(JSON.stringify(conf), "utf-8").toString("base64")
     } else if (["vless", "trojan"].includes(conf?.protocol)) {
-      configStr = `${conf.protocol}://${conf.id}@${conf.add}:${conf.port}?security=${conf.tls}&type=${conf.type}&path=${encodeURIComponent(conf.path)}&host=${encodeURIComponent(conf.host)}&tls=${conf.tls}&sni=${conf.sni}#${encodeURIComponent(conf.ps)}`;
+      configStr = `${conf.protocol}://${conf.id}@${conf.add}:${conf.port}?security=${conf.tls}&type=${conf.net}&path=${encodeURIComponent(conf.path)}&host=${encodeURIComponent(conf.host)}&tls=${conf.tls}&sni=${conf.sni}#${encodeURIComponent(conf.ps)}`;
     }
   } catch (e) {
     // console.log(`Failed to encode ${JSON.stringify(conf)}`, e)
@@ -339,7 +439,7 @@ function decodeConfig(configStr: string): any {
         add: match.groups?.add,
         port: match.groups.port ?? 443,
         ps: match.groups?.ps,
-        type: optionsObj.type ?? "tcp",
+        net: optionsObj.type ?? (optionsObj.net ?? "tcp"),
         host: optionsObj?.host,
         path: optionsObj?.path,
         tls: optionsObj.security ?? "none",
@@ -355,7 +455,7 @@ function decodeConfig(configStr: string): any {
 
 function mixConfig(conf: any, url: URL, ip: string, operator: string, provider: string) {
   try {
-    if (conf.tls != "tls") {
+    if (conf.tls != "tls" || conf.net == "tcp") {
       // console.log(`notls ${JSON.stringify(conf)}`)
       return {}
     }
@@ -380,12 +480,12 @@ function mixConfig(conf: any, url: URL, ip: string, operator: string, provider: 
       var path
       if (part1.includes(":")) {
         addr = part1.replace(/^\//g, "").split(":")
-        conf.port = addr[1]
+        conf.port = parseInt(addr[1])
         addr = addr[0]
         path = "/" + part2.replace(/^\//g, "")
       } else if (part2.includes(":")) {
         addr = part2.replace(/^\//g, "").split(":")
-        conf.port = addr[1]
+        conf.port = parseInt(addr[1])
         addr = addr[0]
         path = "/" + part1.replace(/^\//g, "")
       } else if (part1.includes(".")) {
@@ -412,17 +512,19 @@ function mixConfig(conf: any, url: URL, ip: string, operator: string, provider: 
     if (ip) {
       conf.add = ip
     } else {
-      conf.add = addressList[Math.floor(Math.random() * addressList.length)]
+      conf.add = domainList[Math.floor(Math.random() * domainList.length)]
     }
 
-    if (!conf?.host) {
-      conf.host = addr
+    if (conf?.port != 443) {
+      return {}
     }
 
-    conf.path = "/" + addr + ":" + conf.port + (conf?.path ? "/" + conf.path.replace(/^\//g, "") : "")
-    conf.fp = fpList[Math.floor(Math.random() * fpList.length)]
+    // conf.path = "/" + addr + ":" + conf.port + (conf?.path ? "/" + conf.path.replace(/^\//g, "") : "")
+    conf.path = "/" + addr + (conf?.path ? "/" + conf.path.replace(/^\//g, "") : "")
     conf.alpn = alpnList[Math.floor(Math.random() * alpnList.length)]
-    conf.port = 443
+    conf.fp = fpList[Math.floor(Math.random() * fpList.length)]
+    conf.utls = conf.fp
+    // conf.port = 443
     return conf
   } catch (e) {
     // console.log(`Failed to merge config ${JSON.stringify(conf)}`, e)
@@ -442,7 +544,7 @@ function renameConfig(conf: any, provider: string) {
 }
 
 function getMultipleRandomElements(arr: Array<any>, num: number) {
-  var shuffled = [...arr].sort(() => 0.5 - Math.random())
+  var shuffled = arr.slice(0, num * 2).sort(() => 0.5 - Math.random())
   return shuffled.slice(0, num)
 }
 
