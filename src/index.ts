@@ -110,32 +110,38 @@ var cleanIPs: Array<any> = []
 var maxConfigs: number = MAX_CONFIGS
 var includeOriginalConfigs: boolean = INCLUDE_ORIGINAL
 var onlyOriginalConfigs: boolean = ONLY_ORIGINAL
+
 var alpnList: Array<string> = [
   "h2,http/1.1",
   "h2,http/1.1",
   "h2,http/1.1",
   "http/1.1",
 ]
+
 var fpList: Array<string> = [
-  "chrome_auto",
-  "edge_auto",
-  "ios_auto",
-  "firefox_auto",
-  "android_11_okhttp",
-  "safari_auto",
-  "ios_13",
-  "ios_14",
-  "360_auto",
+  "chrome",
+  "chrome",
+  "chrome",
+  "firefox",
+  "safari",
+  "edge",
+  "ios",
+  "android",
+  "random"
 ]
+
 var domainList: Array<string> = [
   "discord.com",
   "laravel.com",
   "cdnjs.com",
   "www.speedtest.net",
-  "speed.cloudflare.com",
   "workers.dev",
+  "nginx.com",
+  "chat.openai.com",
+  "auth0.openai.com",
+  "codepen.io",
+  "api.jquery.com"
 ]
-
 
 import { Buffer } from 'buffer'
 
