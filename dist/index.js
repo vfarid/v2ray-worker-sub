@@ -1,5 +1,5 @@
 /*!
-  * v2ray Subscription Worker v1.7
+  * v2ray Subscription Worker v1.7a
   * Copyright 2023 Vahid Farid (https://twitter.com/vahidfarid)
   * Licensed under GPLv3 (https://github.com/vfarid/v2ray-worker-sub/blob/main/Licence.md)
   */
@@ -2010,23 +2010,27 @@ var alpnList = [
   "http/1.1"
 ];
 var fpList = [
-  "chrome_auto",
-  "edge_auto",
-  "ios_auto",
-  "firefox_auto",
-  "android_11_okhttp",
-  "safari_auto",
-  "ios_13",
-  "ios_14",
-  "360_auto"
+  "chrome",
+  "chrome",
+  "chrome",
+  "firefox",
+  "safari",
+  "edge",
+  "ios",
+  "android",
+  "random"
 ];
 var domainList = [
   "discord.com",
   "laravel.com",
   "cdnjs.com",
   "www.speedtest.net",
-  "speed.cloudflare.com",
-  "workers.dev"
+  "workers.dev",
+  "nginx.com",
+  "chat.openai.com",
+  "auth0.openai.com",
+  "codepen.io",
+  "api.jquery.com"
 ];
 var src_default = {
   async fetch(request) {
