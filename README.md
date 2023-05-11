@@ -85,43 +85,15 @@ https://my-worker.my-id.workers.dev/sub?max=200&fp=chrome&alpn=h2,http/1.1
 
 ردیف | fp
 ---  | ---
- 1   | chrome_auto
- 2   | edge_auto
- 3   | ios_auto
- 4   | firefox_auto
- 5   | qq_auto
- 6   | android_11_okhttp
- 7   | safari_auto
+ 1   | chrome
+ 2   | edge
+ 3   | ios
+ 4   | firefox
+ 5   | ios
+ 6   | android
+ 7   | safari
  8   | randomized
- 9   | randomizedalpn
-10   | randomizednoalpn
-11   | firefox_55
-12   | firefox_56
-13   | firefox_63
-14   | firefox_65
-15   | firefox_99
-16   | firefox_102
-17   | firefox_105
-18   | chrome_58
-19   | chrome_62
-20   | chrome_70
-21   | chrome_72
-22   | chrome_83
-23   | chrome_87
-24   | chrome_96
-25   | chrome_100
-26   | chrome_102
-27   | ios_11_1
-28   | ios_12_1
-29   | ios_13
-30   | ios_14
-31   | edge_85
-32   | edge_106
-33   | safari_16_0
-34   | 360_auto
-35   | 360_7_5
-36   | 360_11_0
-37   | qq_11_1
+ 9   | random
 ---  | ---
 
 لیست alpn های قابل قبول:
