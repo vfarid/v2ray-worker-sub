@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+    <meta charset='UTF-8' />
+    <title>V2Ray Worker Sub</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.1/css/bootstrap.min.css' crossorigin='anonymous' referrerpolicy='no-referrer' />
+    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css' crossorigin='anonymous' referrerpolicy='no-referrer' />
+    <style>
+        body {
+            background-color: white;
+        }
+        
+        #darkModeToggle .fa-sun {
+            color: #ffc107;
+        }
+        
+        #darkModeToggle .fa-moon {
+            color: #111;
+        }
+        
+        body.dark-mode {
+            background-color: black;
+            color: white;
+        }
+        
+        body.dark-mode input[type='text'],
+        body.dark-mode input[type='number'] {
+            background-color: #111;
+            color: white;
+        }
+        
+        body.dark-mode .list-group-item {
+            background-color: #222;
+            color: white;
+        }
+        
+        body.dark-mode .card-header,
+        body.dark-mode .card-body,
+        body.dark-mode .card-footer {
+            background-color: #333;
+            color: white;
+        }
+        
+        body.dark-mode .card-header h3.mb-0 {
+            color: white;
+        }
+        
+        body.dark-mode .form-select {
+            background-color: #111;
+            color: #fff;
+        }
+    </style>
+</head>
+
+<body>
+    <div class='container mt-5'>
+        <div class='card'>
+            <div class='card-header text-center'>
+                <h3 class='mb-0'>V2Ray Worker Sub</h3>
+            </div>
+            <div class='card-body'>
+                <form action='/sub' method='GET' id='isp-form'>
+                    <div class='row form-group mb-3'>
+                        <label for='isp' class='col-sm-3 col-form-label'>ISP:</label>
+                        <div class='col-sm-9'>
+                            <select class='form-select' name='isp' id='isp'>
+                                <option value='none' selected>پیشفرض</option>
+                                <option value='mci'>همراه‌اول</option>
+                                <option value='mtn'>ایرانسل</option>
+                                <option value='mkh'>مخابرات</option>
+                                <option value='rtl'>رایتل</option>
+                                <option value='hwb'>های‌وب</option>
+                                <option value='ast'>آسیاتک</option>
+                                <option value='sht'>شاتل</option>
+                                <option value='prs'>پارس‌آنلاین</option>
+                                <option value='mbt'>مبین‌نت</option>
+                                <option value='ask'>اندیشه‌سبز</option>
+                                <option value='rsp'>رسپینا</option>
+                                <option value='afn'>افرانت</option>
+                                <option value='ztl'>زی‌تل</option>
+                                <option value='psm'>پیشگامان</option>
+                                <option value='arx'>آراکس</option>
+                                <option value='smt'>سامانتل</option>
+                                <option value='shm'>شاتل‌موبایل</option>
+                                <option value='fnv'>فن‌آوا</option>
+                                <option value='dbn'>دیده‌بان‌نت</option>
+                                <option value='apt'>آپتل</option>
+                                <option value='fnp'>فناپ‌تلکام</option>
+                                <option value='ryn'>رای‌نت</option>
+                                <option value='sbn'>صبانت</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class='row form-group mb-3'>
+                        <label for='maxConfigs' class='col-sm-3 col-form-label'>Maximum Configs:</label>
+                        <div class='col-sm-9'>
+                            <input type='number' class='form-control' id='maxConfigs' name='maxConfigs' min='0' max='2000' value='0'>
+                        </div>
+                    </div>
+
+
+                    <div class='mb-3 form-check'>
+                        <input type='checkbox' class='form-check-input' id='includeOriginalConfigs' name='includeOriginalConfigs' />
+                        <label class='form-check-label' for='includeOriginalConfigs'>Include Original Configs</label>
+                    </div>
+
+                    <div class='mb-3 form-check'>
+                        <input type='checkbox' class='form-check-input' id='mergeConfigs' name='mergeConfigs' checked/>
+                        <label class='form-check-label' for='mergeConfigs'>Merge Configs</label>
+                    </div>
+
+                    <div class='row form-group mb-3'>
+                        <label for='fp' class='col-sm-3 col-form-label'>Fingerprint:</label>
+                        <div class='col-sm-9'>
+                            <select class='form-select' id='fp' name='fp'>
+                                <option value='none' selected>پیشفرض</option>
+                                <option value='chrome'>Chrome</option>
+                                <option value='edge'>Edge</option>
+                                <option value='ios'>iOS Safari</option>
+                                <option value='firefox'>Firefox</option>
+                                <option value='android'>Android</option>
+                                <option value='safari'>Safari</option>
+                                <option value='randomized'>Randomized</option>
+                                <option value='random'>Random</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class='row form-group mb-3'>
+                        <label for='alpn' class='col-sm-3 col-form-label'>ALPN:</label>
+                        <div class='col-sm-9'>
+                            <select class='form-select' id='alpn' name='alpn'>
+                                <option value='none' selected>پیشفرض</option>
+                                <option value='h2,http/1.1'>h2,http/1.1</option>
+                                <option value='h2'>h2</option>
+                                <option value='http/1.1'>http/1.1</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class='row form-group mb-3'>
+                        <label for='provider' class='col-sm-3 col-form-label'>Select a provider:</label>
+                        <div class='col-sm-9'>
+                            <select class='form-select' id='provider' name='provider'>
+                                <option value='none' selected>پیشفرض</option>
+                                <option value='mahdibland'>Mahdibland</option>
+                                <option value='vpei'>VPEI</option>
+                                <option value='mfuu'>MFUU</option>
+                                <option value='peasoft'>Peasoft</option>
+                                <option value='ermaozi'>Ermaozi</option>
+                                <option value='aiboboxx'>Aiboboxx</option>
+                                <option value='pawdroid'>Pawdroid</option>
+                                <option value='autoproxy'>Autoproxy</option>
+                                <option value='freefq'>FreeFQ</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class='row form-group mb-3'>
+                        <label for='cleanIP' class='col-sm-3 col-form-label'>IP or Domain:</label>
+                        <div class='col-sm-9'>
+                            <input type='text' class='form-control' id='cleanIP' name='cleanIP' />
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class='card-footer btn-group'>
+                <button type='submit' class='btn btn-primary' onclick='makeSub()'>Submit</button>
+                <button type='button' class='btn' id='darkModeToggle' onclick='toggleDarkMode()'>
+                    <i class='fas fa-sun'></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src='https://code.jquery.com/jquery-3.6.0.min.js'></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.1/js/bootstrap.min.js' crossorigin='anonymous' referrerpolicy='no-referrer'></script>
+    <script>
+        const baseURL = `https://{{url}}/sub`;
+        $(document).ready(function() {
+            // Submit form using AJAX
+            $('#isp-form').submit(function(event) {
+                event.preventDefault();
+                makeSub();
+            });
+        });
+
+        function toggleDarkMode() {
+            $('body').toggleClass('dark-mode');
+            $('#darkModeToggle i').toggleClass('fa-sun');
+            $('#darkModeToggle i').toggleClass('fa-moon');
+        }
+
+        function makeSub() {
+            let subURL = baseURL;
+            let isp = $('#isp').val();
+            let maxConfigs = $('#maxConfigs').val();
+            let original = $('#includeOriginalConfigs').is(':checked');
+            let merge = $('#mergeConfigs').is(':checked');
+            let fp = $('#fp').val();
+            let alpn = $('#alpn').val();
+            let provider = $('#provider').val();
+            let ip = $('#cleanIP').val();
+
+            if (isp != 'none') subURL += `/${isp}?`;
+            else if (ip) subURL += `/${ip}?`;
+            else subURL += '?';
+            if (maxConfigs > 0) subURL += `max=${maxConfigs}&`;
+            if (original) subURL += 'original=yes&';
+            if (!merge) subURL += 'merge=no&';
+            if (fp != 'none') subURL += `fp=${fp}&`;
+            if (alpn != 'none') subURL += `alpn=${alpn}&`;
+            if (provider != 'none') subURL += `provider=${provider}&`;
+
+            if (subURL.slice(-1) === '&') {
+                subURL = subURL.slice(0, -1);
+            }
+
+            console.log(subURL);
+            $('#urlText').text(subURL);
+        }
+    </script>
+</body>
+
+</html>
