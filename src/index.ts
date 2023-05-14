@@ -319,7 +319,11 @@ export default {
     } else {
       let response: string = await fetch(indexPageURL).then(r => r.text())
       response = response.replace('{{url}}', url.hostname);
-      return new Response(response);
+      return new Response(response, {
+        headers: {
+          "content-type": "text/html;charset=UTF-8"
+        }
+      });
     }
   }
 }
