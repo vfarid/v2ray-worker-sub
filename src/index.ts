@@ -239,7 +239,7 @@ export default {
               random: sub.random,
               count: configPerList,
               configs: newConfigs.filter((cnf: any) => cnf.match(new RegExp(`(${selectedTypes.join("|")})`, "i"))),
-              renamesConfigs: null,
+              renamedConfigs: null,
             })
           }
         } catch (e) { }
