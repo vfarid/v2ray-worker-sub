@@ -550,7 +550,11 @@ function renameConfig(conf: any, provider: string) {
 }
 
 function getMultipleRandomElements(arr: Array<any>, num: number) {
-  var shuffled = arr.slice(0, num * 2).sort(() => 0.5 - Math.random())
+  var shuffled = [...arr]
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
   return shuffled.slice(0, num)
 }
 
