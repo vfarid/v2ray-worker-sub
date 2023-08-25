@@ -1,31 +1,20 @@
 {
-  "name": "v2ray-worker-sub",
-  "version": "1.3.0",
-  "type": "module",
-  "license": "GNU General Public License v3.0",
-  "date": "2023-04-11",
-  "devDependencies": {
-    "@cloudflare/workers-types": "^4.20230404.0",
-    "@types/node": "^18.15.11",
-    "@types/ws": "^8.5.4",
-    "typescript": "^5.0.4"
-  },
-  "authors": [
-    {
-      "name": "Vahid Farid",
-      "email": "vahidfarid@gmail.com"
-    }
-  ],
-  "private": false,
+  "name": "v2ray-worker",
+  "version": "0.0.0",
+  "private": true,
   "scripts": {
-    "start": "wrangler dev",
-    "deploy": "wrangler publish"
+    "deploy": "wrangler deploy",
+    "start": "wrangler dev"
   },
-  "dependencies": {
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20230419.0",
+    "@types/js-yaml": "^4.0.5",
+    "@types/node": "^20.5.5",
     "buffer": "^6.0.3",
-    "node": "^19.8.1",
-    "node-buffer": "^1.0.3",
-    "v2ray": "^0.0.0",
-    "ws": "^8.13.0"
+    "fs": "^0.0.1-security",
+    "itty-router": "^3.0.12",
+    "js-yaml": "^4.1.0",
+    "typescript": "^5.0.4",
+    "wrangler": "^3.0.0"
   }
 }
